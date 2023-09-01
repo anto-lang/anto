@@ -4,9 +4,9 @@ import (
 	"fmt"
 	"reflect"
 
-	"github.com/antonmedv/expr/ast"
-	"github.com/antonmedv/expr/builtin"
-	"github.com/antonmedv/expr/vm/runtime"
+	"github.com/anto-lang/anto/ast"
+	"github.com/anto-lang/anto/builtin"
+	"github.com/anto-lang/anto/vm/runtime"
 )
 
 type Config struct {
@@ -102,7 +102,7 @@ func (c *Config) Check() {
 		if kind(t.Type) == reflect.Func {
 			for _, b := range c.Builtins {
 				if b.Name == fnName {
-					panic(fmt.Errorf(`cannot override builtin %s(): use expr.DisableBuiltin("%s") to override`, b.Name, b.Name))
+					panic(fmt.Errorf(`cannot override builtin %s(): use anto.DisableBuiltin("%s") to override`, b.Name, b.Name))
 				}
 			}
 		}
@@ -110,7 +110,7 @@ func (c *Config) Check() {
 	for _, f := range c.Functions {
 		for _, b := range c.Builtins {
 			if b.Name == f.Name {
-				panic(fmt.Errorf(`cannot override builtin %s(); use expr.DisableBuiltin("%s") to override`, f.Name, f.Name))
+				panic(fmt.Errorf(`cannot override builtin %s(); use anto.DisableBuiltin("%s") to override`, f.Name, f.Name))
 			}
 		}
 	}

@@ -1,6 +1,6 @@
 # Visitor and Patch
 
-The [ast](https://pkg.go.dev/github.com/antonmedv/expr/ast?tab=doc) package 
+The [ast](https://pkg.go.dev/github.com/anto-lang/anto/ast?tab=doc) package 
 provides the `ast.Visitor` interface and the `ast.Walk` function. It can be
 used to customize the AST before compiling.
 
@@ -12,8 +12,8 @@ package main
 import (
 	"fmt"
 
-	"github.com/antonmedv/expr/ast"
-	"github.com/antonmedv/expr/parser"
+	"github.com/anto-lang/anto/ast"
+	"github.com/anto-lang/anto/parser"
 )
 
 type visitor struct {
@@ -41,10 +41,10 @@ func main() {
 
 ## Patch
 
-Specify a visitor to modify the AST with `expr.Patch` function.  
+Specify a visitor to modify the AST with `anto.Patch` function.  
 
 ```go
-program, err := expr.Compile(code, expr.Patch(&visitor{}))
+program, err := anto.Compile(code, anto.Patch(&visitor{}))
 ```
  
 For example, let's pass a context to every function call:
@@ -57,8 +57,8 @@ import (
 	"fmt"
 	"reflect"
 
-	"github.com/antonmedv/expr"
-	"github.com/antonmedv/expr/ast"
+	"github.com/anto-lang/anto"
+	"github.com/anto-lang/anto/ast"
 )
 
 func main() {
@@ -71,12 +71,12 @@ func main() {
 
 	code := `foo(42)` // will be converted to foo(ctx, 42)
 
-	program, err := expr.Compile(code, expr.Env(env), expr.Patch(patcher{}))
+	program, err := anto.Compile(code, anto.Env(env), anto.Patch(patcher{}))
 	if err != nil {
 		panic(err)
 	}
 
-	output, err := expr.Run(program, env)
+	output, err := anto.Run(program, env)
 	if err != nil {
 		panic(err)
 	}

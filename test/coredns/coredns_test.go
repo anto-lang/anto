@@ -4,8 +4,8 @@ import (
 	"context"
 	"testing"
 
-	"github.com/antonmedv/expr"
-	"github.com/antonmedv/expr/test/coredns"
+	"github.com/anto-lang/anto"
+	"github.com/anto-lang/anto/test/coredns"
 	"github.com/stretchr/testify/assert"
 )
 
@@ -25,7 +25,7 @@ func TestCoreDNS(t *testing.T) {
 
 	for _, test := range tests {
 		t.Run(test.input, func(t *testing.T) {
-			_, err := expr.Compile(test.input, expr.Env(env), expr.DisableBuiltin("type"))
+			_, err := anto.Compile(test.input, anto.Env(env), anto.DisableBuiltin("type"))
 			assert.NoError(t, err)
 		})
 	}

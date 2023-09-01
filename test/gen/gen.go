@@ -6,9 +6,9 @@ import (
 	"reflect"
 	"runtime/debug"
 
-	"github.com/antonmedv/expr"
-	"github.com/antonmedv/expr/ast"
-	"github.com/antonmedv/expr/builtin"
+	"github.com/anto-lang/anto"
+	"github.com/anto-lang/anto/ast"
+	"github.com/anto-lang/anto/builtin"
 )
 
 var env = map[string]any{
@@ -132,11 +132,11 @@ func main() {
 			{10, 5},
 		})).String()
 
-		program, err := expr.Compile(code, expr.Env(env))
+		program, err := anto.Compile(code, anto.Env(env))
 		if err != nil {
 			continue
 		}
-		_, err = expr.Run(program, env)
+		_, err = anto.Run(program, env)
 		if err != nil {
 			continue
 		}

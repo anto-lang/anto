@@ -4,7 +4,7 @@ import (
 	"fmt"
 	"testing"
 
-	"github.com/antonmedv/expr"
+	"github.com/anto-lang/anto"
 	"github.com/stretchr/testify/require"
 )
 
@@ -37,10 +37,10 @@ func TestPipes(t *testing.T) {
 
 	for _, test := range tests {
 		t.Run(test.input, func(t *testing.T) {
-			program, err := expr.Compile(test.input, expr.Env(env))
+			program, err := anto.Compile(test.input, anto.Env(env))
 			require.NoError(t, err)
 
-			out, err := expr.Run(program, env)
+			out, err := anto.Run(program, env)
 			require.NoError(t, err)
 			require.Equal(t, test.want, out)
 		})
@@ -48,10 +48,10 @@ func TestPipes(t *testing.T) {
 }
 
 func TestPipes_map_filter(t *testing.T) {
-	program, err := expr.Compile(`1..9 | map(# + 1) | filter(# % 2 == 0)`)
+	program, err := anto.Compile(`1..9 | map(# + 1) | filter(# % 2 == 0)`)
 	require.NoError(t, err)
 
-	out, err := expr.Run(program, nil)
+	out, err := anto.Run(program, nil)
 	require.NoError(t, err)
 	require.Equal(t, []any{2, 4, 6, 8, 10}, out)
 }

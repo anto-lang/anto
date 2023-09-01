@@ -5,13 +5,13 @@ import (
 	"strconv"
 	"strings"
 
-	. "github.com/antonmedv/expr/ast"
-	"github.com/antonmedv/expr/builtin"
-	"github.com/antonmedv/expr/conf"
-	"github.com/antonmedv/expr/file"
-	. "github.com/antonmedv/expr/parser/lexer"
-	"github.com/antonmedv/expr/parser/operator"
-	"github.com/antonmedv/expr/parser/utils"
+	. "github.com/anto-lang/anto/ast"
+	"github.com/anto-lang/anto/builtin"
+	"github.com/anto-lang/anto/conf"
+	"github.com/anto-lang/anto/file"
+	. "github.com/anto-lang/anto/parser/lexer"
+	"github.com/anto-lang/anto/parser/operator"
+	"github.com/anto-lang/anto/parser/utils"
 )
 
 var predicates = map[string]struct {

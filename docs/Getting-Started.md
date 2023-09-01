@@ -12,12 +12,12 @@ deeper into its core features:
 Let's start with a simple example:
 
 ```go
-program, err := expr.Compile(`2 + 2`)
+program, err := anto.Compile(`2 + 2`)
 if err != nil {
     panic(err)
 }
 
-output, err := expr.Run(program, nil)
+output, err := anto.Run(program, nil)
 if err != nil {
     panic(err)
 }
@@ -28,8 +28,8 @@ fmt.Print(output) // 4
 Expr compiles the expression `2 + 2` into a bytecode program. Then we run
 the program and get the output. The output is `4` as expected.
 
-The `expr.Compile` function returns a `*vm.Program` and an error. The program
-can be reused between runs. The `expr.Run` function takes a program and an
+The `anto.Compile` function returns a `*vm.Program` and an error. The program
+can be reused between runs. The `anto.Run` function takes a program and an
 environment. The environment is a map of variables that can be used in the
 expression. In this example, we use `nil` as an environment because we don't
 need any variables.
@@ -42,12 +42,12 @@ env := map[string]any{
 	"bar": 200,
 }
 
-program, err := expr.Compile(`foo + bar`, expr.Env(env))
+program, err := anto.Compile(`foo + bar`, anto.Env(env))
 if err != nil {
     panic(err)
 }
 
-output, err := expr.Run(program, env)
+output, err := anto.Run(program, env)
 if err != nil {
     panic(err)
 }
@@ -55,7 +55,7 @@ if err != nil {
 fmt.Print(output) // 300
 ```
 
-Why do we need to pass the environment to the `expr.Compile` function? Expr can be used as a type-safe language. 
+Why do we need to pass the environment to the `anto.Compile` function? Expr can be used as a type-safe language. 
 Expr can infer the type of the expression and check it against the environment. Here is an example:
 
 ```go
@@ -64,7 +64,7 @@ env := map[string]any{
     "age": 35,
 }
 
-program, err := expr.Compile(`name + age`, expr.Env(env))
+program, err := anto.Compile(`name + age`, anto.Env(env))
 if err != nil {
     panic(err) // Will panic with "invalid operation: string + int"
 }
@@ -81,12 +81,12 @@ env := map[string]interface{}{
 
 code := `sprintf(greet, names[0])`
 
-program, err := expr.Compile(code, expr.Env(env))
+program, err := anto.Compile(code, anto.Env(env))
 if err != nil {
 	panic(err)
 }
 
-output, err := expr.Run(program, env)
+output, err := anto.Run(program, env)
 if err != nil {
 	panic(err)
 }
@@ -114,7 +114,7 @@ type Post struct {
 func main() {
 	code := `map(posts, Format(.Date) + ": " + .Body)`
 	
-	program, err := expr.Compile(code, expr.Env(Env{}))
+	program, err := anto.Compile(code, anto.Env(Env{}))
 	if err != nil {
 		panic(err)
 	}
@@ -127,7 +127,7 @@ func main() {
 		},
 	}
 
-	output, err := expr.Run(program, env)
+	output, err := anto.Run(program, env)
 	if err != nil {
 		panic(err)
 	}
@@ -144,19 +144,19 @@ type Env struct {
     Y int
 }
 
-program, err := expr.Compile(`X + Y`, expr.Env(Env{}))
+program, err := anto.Compile(`X + Y`, anto.Env(Env{}))
 if err != nil {
     panic(err)
 }
 
-output, err := expr.Run(program, Env{1, 2})
+output, err := anto.Run(program, Env{1, 2})
 if err != nil {
     panic(err)
 }
 
 fmt.Print(output) // 3
 
-output, err = expr.Run(program, Env{3, 4})
+output, err = anto.Run(program, Env{3, 4})
 if err != nil {
     panic(err)
 }
@@ -165,8 +165,8 @@ fmt.Print(output) // 7
 ```
 
 :::tip
-For one-off expressions, you can use the `expr.Eval` function. It compiles and runs the expression in one step.
+For one-off expressions, you can use the `anto.Eval` function. It compiles and runs the expression in one step.
 ```go
-output, err := expr.Eval(`2 + 2`, env)
+output, err := anto.Eval(`2 + 2`, env)
 ```
 :::

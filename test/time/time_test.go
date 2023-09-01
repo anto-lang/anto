@@ -5,12 +5,12 @@ import (
 	"testing"
 	"time"
 
-	"github.com/antonmedv/expr"
-	"github.com/antonmedv/expr/checker"
-	"github.com/antonmedv/expr/compiler"
-	"github.com/antonmedv/expr/conf"
-	"github.com/antonmedv/expr/parser"
-	"github.com/antonmedv/expr/vm"
+	"github.com/anto-lang/anto"
+	"github.com/anto-lang/anto/checker"
+	"github.com/anto-lang/anto/compiler"
+	"github.com/anto-lang/anto/conf"
+	"github.com/anto-lang/anto/parser"
+	"github.com/anto-lang/anto/vm"
 	"github.com/stretchr/testify/require"
 )
 
@@ -106,10 +106,10 @@ func TestTime_duration(t *testing.T) {
 	env := map[string]any{
 		"foo": time.Date(2000, time.Month(1), 1, 0, 0, 0, 0, time.UTC),
 	}
-	program, err := expr.Compile(`now() - duration("1h") < now() && foo + duration("24h") < now()`, expr.Env(env))
+	program, err := anto.Compile(`now() - duration("1h") < now() && foo + duration("24h") < now()`, anto.Env(env))
 	require.NoError(t, err)
 
-	output, err := expr.Run(program, env)
+	output, err := anto.Run(program, env)
 	require.NoError(t, err)
 	require.Equal(t, true, output)
 }
@@ -134,10 +134,10 @@ func TestTime_date(t *testing.T) {
 	}
 	for _, test := range tests {
 		t.Run(test.input, func(t *testing.T) {
-			program, err := expr.Compile(test.input)
+			program, err := anto.Compile(test.input)
 			require.NoError(t, err)
 
-			output, err := expr.Run(program, nil)
+			output, err := anto.Run(program, nil)
 			require.NoError(t, err)
 			require.Truef(t, test.want.Equal(output.(time.Time)), "want %v, got %v", test.want, output)
 		})

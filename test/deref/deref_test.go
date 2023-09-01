@@ -4,7 +4,7 @@ import (
 	"context"
 	"testing"
 
-	"github.com/antonmedv/expr"
+	"github.com/anto-lang/anto"
 	"github.com/stretchr/testify/require"
 )
 
@@ -17,26 +17,26 @@ func TestDeref_binary(t *testing.T) {
 		},
 	}
 	t.Run("==", func(t *testing.T) {
-		program, err := expr.Compile(`i == 1 && obj.i == 1`, expr.Env(env))
+		program, err := anto.Compile(`i == 1 && obj.i == 1`, anto.Env(env))
 		require.NoError(t, err)
 
-		out, err := expr.Run(program, env)
+		out, err := anto.Run(program, env)
 		require.NoError(t, err)
 		require.Equal(t, true, out)
 	})
 	t.Run("><", func(t *testing.T) {
-		program, err := expr.Compile(`i > 0 && obj.i < 99`, expr.Env(env))
+		program, err := anto.Compile(`i > 0 && obj.i < 99`, anto.Env(env))
 		require.NoError(t, err)
 
-		out, err := expr.Run(program, env)
+		out, err := anto.Run(program, env)
 		require.NoError(t, err)
 		require.Equal(t, true, out)
 	})
 	t.Run("??+", func(t *testing.T) {
-		program, err := expr.Compile(`(i ?? obj.i) + 1`, expr.Env(env))
+		program, err := anto.Compile(`(i ?? obj.i) + 1`, anto.Env(env))
 		require.NoError(t, err)
 
-		out, err := expr.Run(program, env)
+		out, err := anto.Run(program, env)
 		require.NoError(t, err)
 		require.Equal(t, 2, out)
 	})
@@ -52,10 +52,10 @@ func TestDeref_unary(t *testing.T) {
 		},
 	}
 
-	program, err := expr.Compile(`-i < 0 && !!obj.ok`, expr.Env(env))
+	program, err := anto.Compile(`-i < 0 && !!obj.ok`, anto.Env(env))
 	require.NoError(t, err)
 
-	out, err := expr.Run(program, env)
+	out, err := anto.Run(program, env)
 	require.NoError(t, err)
 	require.Equal(t, true, out)
 }
@@ -68,16 +68,16 @@ func TestDeref_eval(t *testing.T) {
 			"i": &i,
 		},
 	}
-	out, err := expr.Eval(`i == 1 && obj.i == 1`, env)
+	out, err := anto.Eval(`i == 1 && obj.i == 1`, env)
 	require.NoError(t, err)
 	require.Equal(t, true, out)
 }
 
 func TestDeref_emptyCtx(t *testing.T) {
-	program, err := expr.Compile(`ctx`)
+	program, err := anto.Compile(`ctx`)
 	require.NoError(t, err)
 
-	output, err := expr.Run(program, map[string]any{
+	output, err := anto.Run(program, map[string]any{
 		"ctx": context.Background(),
 	})
 	require.NoError(t, err)
@@ -85,7 +85,7 @@ func TestDeref_emptyCtx(t *testing.T) {
 }
 
 func TestDeref_emptyCtx_Eval(t *testing.T) {
-	output, err := expr.Eval(`ctx`, map[string]any{
+	output, err := anto.Eval(`ctx`, map[string]any{
 		"ctx": context.Background(),
 	})
 	require.NoError(t, err)
@@ -93,10 +93,10 @@ func TestDeref_emptyCtx_Eval(t *testing.T) {
 }
 
 func TestDeref_context_WithValue(t *testing.T) {
-	program, err := expr.Compile(`ctxWithValue`)
+	program, err := anto.Compile(`ctxWithValue`)
 	require.NoError(t, err)
 
-	output, err := expr.Run(program, map[string]any{
+	output, err := anto.Run(program, map[string]any{
 		"ctxWithValue": context.WithValue(context.Background(), "value", "test"),
 	})
 	require.NoError(t, err)
@@ -104,7 +104,7 @@ func TestDeref_context_WithValue(t *testing.T) {
 }
 
 func TestDeref_method_on_int_pointer(t *testing.T) {
-	output, err := expr.Eval(`foo.Bar()`, map[string]any{
+	output, err := anto.Eval(`foo.Bar()`, map[string]any{
 		"foo": new(foo),
 	})
 	require.NoError(t, err)
@@ -122,7 +122,7 @@ func TestDeref_multiple_pointers(t *testing.T) {
 	b := &a
 	c := &b
 	t.Run("returned as is", func(t *testing.T) {
-		output, err := expr.Eval(`c`, map[string]any{
+		output, err := anto.Eval(`c`, map[string]any{
 			"c": c,
 		})
 		require.NoError(t, err)
@@ -130,7 +130,7 @@ func TestDeref_multiple_pointers(t *testing.T) {
 		require.IsType(t, (**int)(nil), output)
 	})
 	t.Run("+ works", func(t *testing.T) {
-		output, err := expr.Eval(`c+2`, map[string]any{
+		output, err := anto.Eval(`c+2`, map[string]any{
 			"c": c,
 		})
 		require.NoError(t, err)

@@ -1,17 +1,17 @@
-package expr
+package anto
 
 import (
 	"fmt"
 	"reflect"
 
-	"github.com/antonmedv/expr/ast"
-	"github.com/antonmedv/expr/checker"
-	"github.com/antonmedv/expr/compiler"
-	"github.com/antonmedv/expr/conf"
-	"github.com/antonmedv/expr/file"
-	"github.com/antonmedv/expr/optimizer"
-	"github.com/antonmedv/expr/parser"
-	"github.com/antonmedv/expr/vm"
+	"github.com/anto-lang/anto/ast"
+	"github.com/anto-lang/anto/checker"
+	"github.com/anto-lang/anto/compiler"
+	"github.com/anto-lang/anto/conf"
+	"github.com/anto-lang/anto/file"
+	"github.com/anto-lang/anto/optimizer"
+	"github.com/anto-lang/anto/parser"
+	"github.com/anto-lang/anto/vm"
 )
 
 // Option for configuring config.
@@ -29,7 +29,7 @@ func Env(env any) Option {
 }
 
 // AllowUndefinedVariables allows to use undefined variables inside expressions.
-// This can be used with expr.Env option to partially define a few variables.
+// This can be used with anto.Env option to partially define a few variables.
 func AllowUndefinedVariables() Option {
 	return func(c *conf.Config) {
 		c.Strict = false
@@ -214,7 +214,7 @@ func Run(program *vm.Program, env any) (any, error) {
 // Eval parses, compiles and runs given input.
 func Eval(input string, env any) (any, error) {
 	if _, ok := env.(Option); ok {
-		return nil, fmt.Errorf("misused expr.Eval: second argument (env) should be passed without expr.Env")
+		return nil, fmt.Errorf("misused anto.Eval: second argument (env) should be passed without anto.Env")
 	}
 
 	program, err := Compile(input)

@@ -1,8 +1,8 @@
 package optimizer
 
 import (
-	. "github.com/antonmedv/expr/ast"
-	"github.com/antonmedv/expr/conf"
+	. "github.com/anto-lang/anto/ast"
+	"github.com/anto-lang/anto/conf"
 )
 
 func Optimize(node *Node, config *conf.Config) error {

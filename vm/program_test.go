@@ -4,7 +4,7 @@ import (
 	"strings"
 	"testing"
 
-	"github.com/antonmedv/expr/vm"
+	"github.com/anto-lang/anto/vm"
 )
 
 func TestProgram_Disassemble(t *testing.T) {

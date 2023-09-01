@@ -1,7 +1,7 @@
 package optimizer
 
 import (
-	. "github.com/antonmedv/expr/ast"
+	. "github.com/anto-lang/anto/ast"
 )
 
 type filterLast struct{}

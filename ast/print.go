@@ -5,8 +5,8 @@ import (
 	"fmt"
 	"strings"
 
-	"github.com/antonmedv/expr/parser/operator"
-	"github.com/antonmedv/expr/parser/utils"
+	"github.com/anto-lang/anto/parser/operator"
+	"github.com/anto-lang/anto/parser/utils"
 )
 
 func (n *NilNode) String() string {

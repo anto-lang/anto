@@ -6,7 +6,7 @@ import (
 	"strings"
 	"testing"
 
-	"github.com/antonmedv/expr"
+	"github.com/anto-lang/anto"
 )
 
 //go:embed fuzz_corpus.txt
@@ -40,10 +40,10 @@ func TestFuzzExpr_Coverage(t *testing.T) {
 
 	for _, code := range inputs {
 		t.Run(code, func(t *testing.T) {
-			program, err := expr.Compile(code, expr.Env(env))
+			program, err := anto.Compile(code, anto.Env(env))
 			require.NoError(t, err)
 
-			_, err = expr.Run(program, env)
+			_, err = anto.Run(program, env)
 			require.NoError(t, err)
 		})
 	}

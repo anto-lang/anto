@@ -1,4 +1,4 @@
-module github.com/antonmedv/expr
+module github.com/anto-lang/anto
 
 go 1.18
 

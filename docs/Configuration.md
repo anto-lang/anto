@@ -8,7 +8,7 @@ This option allows undefined variables in the expression. By default, Expr will 
 if the expression contains undefined variables.
 
 ```go
-program, err := expr.Compile(`foo + bar`, expr.AllowUndefinedVariables())
+program, err := anto.Compile(`foo + bar`, anto.AllowUndefinedVariables())
 ```
 
 ## AsBool()
@@ -17,7 +17,7 @@ This option forces the expression to return a boolean value. If the expression r
 Expr will return an error.
 
 ```go
-program, err := expr.Compile(`Title contains "Hello"`, expr.AsBool())
+program, err := anto.Compile(`Title contains "Hello"`, anto.AsBool())
 ```
 
 ## AsFloat64()
@@ -26,7 +26,7 @@ This option forces the expression to return a float64 value. If the expression r
 Expr will return an error.
 
 ```go
-program, err := expr.Compile(`42`, expr.AsFloat64())
+program, err := anto.Compile(`42`, anto.AsFloat64())
 ```
 
 :::note
@@ -39,7 +39,7 @@ This option forces the expression to return an int value. If the expression retu
 Expr will return an error.
 
 ```go
-program, err := expr.Compile(`42`, expr.AsInt())
+program, err := anto.Compile(`42`, anto.AsInt())
 ```
 
 :::note
@@ -51,7 +51,7 @@ If the expression returns a float value, Expr truncates it to int.
 Same as `AsInt()` but returns an int64 value.
 
 ```go
-program, err := expr.Compile(`42`, expr.AsInt64())
+program, err := anto.Compile(`42`, anto.AsInt64())
 ```
 
 ## AsKind()
@@ -60,7 +60,7 @@ This option forces the expression to return a value of the specified kind.
 If the expression returns a value of a different kind, Expr will return an error.
 
 ```go
-program, err := expr.Compile(`42`, expr.AsKind(reflect.String))
+program, err := anto.Compile(`42`, anto.AsKind(reflect.String))
 ```
 
 ## ConstExpr()
@@ -70,17 +70,17 @@ If all arguments of the function are constants, Expr will replace the function c
 during the compile step.
 
 ```go
-program, err := expr.Compile(`fib(42)`, expr.ConstExpr("fib"))
+program, err := anto.Compile(`fib(42)`, anto.ConstExpr("fib"))
 ```
 
-[ConstExpr Example](https://pkg.go.dev/github.com/antonmedv/expr?tab=doc#ConstExpr)
+[ConstExpr Example](https://pkg.go.dev/github.com/anto-lang/anto?tab=doc#ConstExpr)
 
 ## Env()
 
 This option passes the environment with variables and functions to the expression.
 
 ```go
-program, err := expr.Compile(`foo + bar`, expr.Env(Env{}))
+program, err := anto.Compile(`foo + bar`, anto.Env(Env{}))
 ```
 
 ## Function()
@@ -88,21 +88,21 @@ program, err := expr.Compile(`foo + bar`, expr.Env(Env{}))
 This option adds a function to the expression.
 
 ```go
-	atoi := expr.Function(
+	atoi := anto.Function(
 		"atoi",
 		func(params ...any) (any, error) {
 			return strconv.Atoi(params[0].(string))
 		},
 	)
 
-	program, err := expr.Compile(`atoi("42")`, atoi)
+	program, err := anto.Compile(`atoi("42")`, atoi)
 ```
 
 Expr sees the `atoi` function as a function with a variadic number of arguments of type `any` and returns a value of type `any`. But, we can specify the types of arguments and the return value by adding the correct function
 signature or multiple signatures.
 
 ```go
-	atoi := expr.Function(
+	atoi := anto.Function(
 		"atoi",
 		func(params ...any) (any, error) {
 			return strconv.Atoi(params[0].(string))
@@ -114,7 +114,7 @@ signature or multiple signatures.
 Or we can simply reuse the `strconv.Atoi` function.
 
 ```go
-	atoi := expr.Function(
+	atoi := anto.Function(
 		"atoi",
 		func(params ...any) (any, error) {
 			return strconv.Atoi(params[0].(string))
@@ -126,7 +126,7 @@ Or we can simply reuse the `strconv.Atoi` function.
 Here is another example with a few function signatures:
 
 ```go
-	toInt := expr.Function(
+	toInt := anto.Function(
 		"toInt",
 		func(params ...any) (any, error) {
 			switch params[0].(type) {

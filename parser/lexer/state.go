@@ -3,7 +3,7 @@ package lexer
 import (
 	"strings"
 
-	"github.com/antonmedv/expr/parser/utils"
+	"github.com/anto-lang/anto/parser/utils"
 )
 
 type stateFn func(*lexer) stateFn

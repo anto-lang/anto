@@ -7,12 +7,12 @@ import (
 	"strings"
 	"testing"
 
-	"github.com/antonmedv/expr"
-	"github.com/antonmedv/expr/ast"
-	"github.com/antonmedv/expr/checker"
-	"github.com/antonmedv/expr/conf"
-	"github.com/antonmedv/expr/parser"
-	"github.com/antonmedv/expr/test/mock"
+	"github.com/anto-lang/anto"
+	"github.com/anto-lang/anto/ast"
+	"github.com/anto-lang/anto/checker"
+	"github.com/anto-lang/anto/conf"
+	"github.com/anto-lang/anto/parser"
+	"github.com/anto-lang/anto/test/mock"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 )
@@ -139,7 +139,7 @@ func TestCheck(t *testing.T) {
 			require.NoError(t, err)
 
 			config := conf.New(mock.Env{})
-			expr.AsBool()(config)
+			anto.AsBool()(config)
 
 			_, err = checker.Check(tree, config)
 			assert.NoError(t, err)
@@ -602,7 +602,7 @@ func TestCheck_AsBool(t *testing.T) {
 	require.NoError(t, err)
 
 	config := &conf.Config{}
-	expr.AsBool()(config)
+	anto.AsBool()(config)
 
 	_, err = checker.Check(tree, config)
 	assert.Error(t, err)
@@ -614,7 +614,7 @@ func TestCheck_AsInt64(t *testing.T) {
 	require.NoError(t, err)
 
 	config := &conf.Config{}
-	expr.AsInt64()(config)
+	anto.AsInt64()(config)
 
 	_, err = checker.Check(tree, config)
 	assert.Error(t, err)
@@ -626,12 +626,12 @@ func TestCheck_TaggedFieldName(t *testing.T) {
 	require.NoError(t, err)
 
 	config := &conf.Config{}
-	expr.Env(struct {
+	anto.Env(struct {
 		x struct {
 			y bool `expr:"bar"`
 		} `expr:"foo"`
 	}{})(config)
-	expr.AsBool()(config)
+	anto.AsBool()(config)
 
 	_, err = checker.Check(tree, config)
 	assert.NoError(t, err)
@@ -674,7 +674,7 @@ func TestCheck_AllowUndefinedVariables(t *testing.T) {
 	require.NoError(t, err)
 
 	config := conf.New(Env{})
-	expr.AllowUndefinedVariables()(config)
+	anto.AllowUndefinedVariables()(config)
 
 	_, err = checker.Check(tree, config)
 	assert.NoError(t, err)
@@ -687,8 +687,8 @@ func TestCheck_AllowUndefinedVariables_DefaultType(t *testing.T) {
 	require.NoError(t, err)
 
 	config := conf.New(env)
-	expr.AllowUndefinedVariables()(config)
-	expr.AsBool()(config)
+	anto.AllowUndefinedVariables()(config)
+	anto.AsBool()(config)
 
 	_, err = checker.Check(tree, config)
 	assert.NoError(t, err)
@@ -701,7 +701,7 @@ func TestCheck_AllowUndefinedVariables_OptionalChaining(t *testing.T) {
 	require.NoError(t, err)
 
 	config := conf.New(Env{})
-	expr.AllowUndefinedVariables()(config)
+	anto.AllowUndefinedVariables()(config)
 
 	_, err = checker.Check(tree, config)
 	assert.NoError(t, err)
@@ -720,13 +720,13 @@ func TestCheck_OperatorOverload(t *testing.T) {
 	require.NoError(t, err)
 
 	config := conf.New(env)
-	expr.AsBool()(config)
+	anto.AsBool()(config)
 
 	_, err = checker.Check(tree, config)
 	require.Error(t, err)
 	require.Contains(t, err.Error(), "invalid operation: + (mismatched types checker_test.Date and checker_test.Date)")
 
-	expr.Operator("+", "add")(config)
+	anto.Operator("+", "add")(config)
 	_, err = checker.Check(tree, config)
 	require.NoError(t, err)
 }
@@ -830,8 +830,8 @@ func TestCheck_cast_to_expected_works_with_interface(t *testing.T) {
 		require.NoError(t, err)
 
 		config := conf.New(Env{})
-		expr.AsFloat64()(config)
-		expr.AsAny()(config)
+		anto.AsFloat64()(config)
+		anto.AsAny()(config)
 
 		_, err = checker.Check(tree, config)
 		require.NoError(t, err)
@@ -846,7 +846,7 @@ func TestCheck_cast_to_expected_works_with_interface(t *testing.T) {
 		require.NoError(t, err)
 
 		config := conf.New(env)
-		expr.AsKind(reflect.String)(config)
+		anto.AsKind(reflect.String)(config)
 
 		_, err = checker.Check(tree, config)
 		require.NoError(t, err)
@@ -858,14 +858,14 @@ func TestCheck_operator_in_works_with_interfaces(t *testing.T) {
 	require.NoError(t, err)
 
 	config := conf.New(nil)
-	expr.AllowUndefinedVariables()(config)
+	anto.AllowUndefinedVariables()(config)
 
 	_, err = checker.Check(tree, config)
 	require.NoError(t, err)
 }
 
 func TestCheck_Function_types_are_checked(t *testing.T) {
-	add := expr.Function(
+	add := anto.Function(
 		"add",
 		func(p ...any) (any, error) {
 			out := 0
@@ -912,7 +912,7 @@ func TestCheck_Function_types_are_checked(t *testing.T) {
 }
 
 func TestCheck_Function_without_types(t *testing.T) {
-	add := expr.Function(
+	add := anto.Function(
 		"add",
 		func(p ...any) (any, error) {
 			out := 0
@@ -960,7 +960,7 @@ func TestCheck_do_not_override_params_for_functions(t *testing.T) {
 		},
 	}
 	config := conf.New(env)
-	expr.Function(
+	anto.Function(
 		"bar",
 		func(p ...any) (any, error) {
 			return p[0].(string), nil

@@ -5,10 +5,10 @@ import (
 	"os"
 	"strings"
 
-	"github.com/antonmedv/expr"
-	"github.com/antonmedv/expr/builtin"
-	"github.com/antonmedv/expr/debug"
-	"github.com/antonmedv/expr/vm"
+	"github.com/anto-lang/anto"
+	"github.com/anto-lang/anto/builtin"
+	"github.com/anto-lang/anto/debug"
+	"github.com/anto-lang/anto/vm"
 	"github.com/bettercap/readline"
 )
 
@@ -70,12 +70,12 @@ func main() {
 			continue
 		}
 
-		program, err = expr.Compile(line, expr.Env(env))
+		program, err = anto.Compile(line, anto.Env(env))
 		if err != nil {
 			fmt.Printf("compile error: %s\n", err)
 			continue
 		}
-		output, err := expr.Run(program, env)
+		output, err := anto.Run(program, env)
 		if err != nil {
 			fmt.Printf("runtime error: %s\n", err)
 			continue

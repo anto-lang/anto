@@ -8,8 +8,8 @@ import (
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 
-	"github.com/antonmedv/expr/file"
-	. "github.com/antonmedv/expr/parser/lexer"
+	"github.com/anto-lang/anto/file"
+	. "github.com/anto-lang/anto/parser/lexer"
 )
 
 func TestLex(t *testing.T) {

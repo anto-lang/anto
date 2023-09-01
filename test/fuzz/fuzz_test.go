@@ -6,7 +6,7 @@ import (
 	"strings"
 	"testing"
 
-	"github.com/antonmedv/expr"
+	"github.com/anto-lang/anto"
 )
 
 //go:embed fuzz_corpus.txt
@@ -72,12 +72,12 @@ func FuzzExpr(f *testing.F) {
 	}
 
 	f.Fuzz(func(t *testing.T, code string) {
-		program, err := expr.Compile(code, expr.Env(env))
+		program, err := anto.Compile(code, anto.Env(env))
 		if err != nil {
 			t.Skipf("compile error: %s", err)
 		}
 
-		_, err = expr.Run(program, env)
+		_, err = anto.Run(program, env)
 		if err != nil {
 			for _, r := range skip {
 				if r.MatchString(err.Error()) {

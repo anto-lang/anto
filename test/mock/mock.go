@@ -6,7 +6,7 @@ import (
 	"strings"
 	"time"
 
-	"github.com/antonmedv/expr/ast"
+	"github.com/anto-lang/anto/ast"
 )
 
 type Env struct {

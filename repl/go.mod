@@ -1,10 +1,10 @@
-module github.com/antonmedv/expr/repl
+module github.com/anto-lang/anto/repl
 
 go 1.20
 
 require (
-	github.com/antonmedv/expr v1.13.0
-	github.com/antonmedv/expr/debug v0.0.0
+	github.com/anto-lang/anto v1.13.0
+	github.com/anto-lang/anto/debug v0.0.0
 	github.com/bettercap/readline v0.0.0-20210228151553-655e48bcb7bf
 )
 
@@ -21,6 +21,6 @@ require (
 	golang.org/x/text v0.12.0 // indirect
 )
 
-replace github.com/antonmedv/expr => ../
+replace github.com/anto-lang/anto => ../
 
-replace github.com/antonmedv/expr/debug => ../debug
+replace github.com/anto-lang/anto/debug => ../debug

@@ -9,10 +9,10 @@ import (
 	"strings"
 	"text/tabwriter"
 
-	"github.com/antonmedv/expr/ast"
-	"github.com/antonmedv/expr/builtin"
-	"github.com/antonmedv/expr/file"
-	"github.com/antonmedv/expr/vm/runtime"
+	"github.com/anto-lang/anto/ast"
+	"github.com/anto-lang/anto/builtin"
+	"github.com/anto-lang/anto/file"
+	"github.com/anto-lang/anto/vm/runtime"
 )
 
 type Program struct {

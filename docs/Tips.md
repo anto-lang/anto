@@ -10,8 +10,8 @@ package main
 
 import (
 	"fmt"
-	"github.com/antonmedv/expr"
-	"github.com/antonmedv/expr/vm"
+	"github.com/anto-lang/anto"
+	"github.com/anto-lang/anto/vm"
 )
 
 func main() {
@@ -20,7 +20,7 @@ func main() {
 		"bar": 2,
 	}
 
-	program, err := expr.Compile("foo + bar", expr.Env(env))
+	program, err := anto.Compile("foo + bar", anto.Env(env))
 	if err != nil {
 		panic(err)
 	}

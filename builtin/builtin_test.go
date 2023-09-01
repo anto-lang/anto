@@ -7,12 +7,12 @@ import (
 	"testing"
 	"time"
 
-	"github.com/antonmedv/expr"
-	"github.com/antonmedv/expr/builtin"
-	"github.com/antonmedv/expr/checker"
-	"github.com/antonmedv/expr/conf"
-	"github.com/antonmedv/expr/parser"
-	"github.com/antonmedv/expr/test/mock"
+	"github.com/anto-lang/anto"
+	"github.com/anto-lang/anto/builtin"
+	"github.com/anto-lang/anto/checker"
+	"github.com/anto-lang/anto/conf"
+	"github.com/anto-lang/anto/parser"
+	"github.com/anto-lang/anto/test/mock"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 )
@@ -126,10 +126,10 @@ func TestBuiltin(t *testing.T) {
 
 	for _, test := range tests {
 		t.Run(test.input, func(t *testing.T) {
-			program, err := expr.Compile(test.input, expr.Env(env))
+			program, err := anto.Compile(test.input, anto.Env(env))
 			require.NoError(t, err)
 
-			out, err := expr.Run(program, env)
+			out, err := anto.Run(program, env)
 			require.NoError(t, err)
 			assert.Equal(t, test.want, out)
 		})
@@ -161,7 +161,7 @@ func TestBuiltin_works_with_any(t *testing.T) {
 			for i := 1; i <= arity; i++ {
 				args[i-1] = fmt.Sprintf("arg%d", i)
 			}
-			_, err := expr.Compile(fmt.Sprintf(`%s(%s)`, b.Name, strings.Join(args, ", "))) // expr.Env(env) is not needed
+			_, err := anto.Compile(fmt.Sprintf(`%s(%s)`, b.Name, strings.Join(args, ", "))) // anto.Env(env) is not needed
 			assert.NoError(t, err)
 		})
 	}
@@ -194,7 +194,7 @@ func TestBuiltin_errors(t *testing.T) {
 	}
 	for _, test := range errorTests {
 		t.Run(test.input, func(t *testing.T) {
-			_, err := expr.Eval(test.input, nil)
+			_, err := anto.Eval(test.input, nil)
 			assert.Error(t, err)
 			assert.Contains(t, err.Error(), test.err)
 		})
@@ -245,7 +245,7 @@ func TestBuiltin_memory_limits(t *testing.T) {
 
 	for _, test := range tests {
 		t.Run(test.input, func(t *testing.T) {
-			_, err := expr.Eval(test.input, nil)
+			_, err := anto.Eval(test.input, nil)
 			assert.Error(t, err)
 			assert.Contains(t, err.Error(), "memory budget exceeded")
 		})
@@ -261,24 +261,24 @@ func TestBuiltin_disallow_builtins_override(t *testing.T) {
 			},
 		}
 		assert.Panics(t, func() {
-			_, _ = expr.Compile(`string(len("foo")) + repeat("0", 2)`, expr.Env(env))
+			_, _ = anto.Compile(`string(len("foo")) + repeat("0", 2)`, anto.Env(env))
 		})
 	})
-	t.Run("via expr.Function", func(t *testing.T) {
-		length := expr.Function("len",
+	t.Run("via anto.Function", func(t *testing.T) {
+		length := anto.Function("len",
 			func(params ...any) (any, error) {
 				return 42, nil
 			},
 			new(func() int),
 		)
-		repeat := expr.Function("repeat",
+		repeat := anto.Function("repeat",
 			func(params ...any) (any, error) {
 				return params[0], nil
 			},
 			new(func(string) string),
 		)
 		assert.Panics(t, func() {
-			_, _ = expr.Compile(`string(len("foo")) + repeat("0", 2)`, length, repeat)
+			_, _ = anto.Compile(`string(len("foo")) + repeat("0", 2)`, length, repeat)
 		})
 	})
 }
@@ -293,31 +293,31 @@ func TestBuiltin_DisableBuiltin(t *testing.T) {
 				env := map[string]any{
 					b.Name: func() int { return 42 },
 				}
-				program, err := expr.Compile(b.Name+"()", expr.Env(env), expr.DisableBuiltin(b.Name))
+				program, err := anto.Compile(b.Name+"()", anto.Env(env), anto.DisableBuiltin(b.Name))
 				require.NoError(t, err)
 
-				out, err := expr.Run(program, env)
+				out, err := anto.Run(program, env)
 				require.NoError(t, err)
 				assert.Equal(t, 42, out)
 			})
 		}
 	})
-	t.Run("via expr.Function", func(t *testing.T) {
+	t.Run("via anto.Function", func(t *testing.T) {
 		for _, b := range builtin.Builtins {
 			if b.Predicate {
 				continue // TODO: allow to disable predicates
 			}
 			t.Run(b.Name, func(t *testing.T) {
-				fn := expr.Function(b.Name,
+				fn := anto.Function(b.Name,
 					func(params ...any) (any, error) {
 						return 42, nil
 					},
 					new(func() int),
 				)
-				program, err := expr.Compile(b.Name+"()", fn, expr.DisableBuiltin(b.Name))
+				program, err := anto.Compile(b.Name+"()", fn, anto.DisableBuiltin(b.Name))
 				require.NoError(t, err)
 
-				out, err := expr.Run(program, nil)
+				out, err := anto.Run(program, nil)
 				require.NoError(t, err)
 				assert.Equal(t, 42, out)
 			})
@@ -326,7 +326,7 @@ func TestBuiltin_DisableBuiltin(t *testing.T) {
 }
 
 func TestBuiltin_DisableAllBuiltins(t *testing.T) {
-	_, err := expr.Compile(`len("foo")`, expr.Env(nil), expr.DisableAllBuiltins())
+	_, err := anto.Compile(`len("foo")`, anto.Env(nil), anto.DisableAllBuiltins())
 	require.Error(t, err)
 	assert.Contains(t, err.Error(), "unknown name len")
 }
@@ -336,24 +336,24 @@ func TestBuiltin_EnableBuiltin(t *testing.T) {
 		env := map[string]any{
 			"repeat": func() string { return "repeat" },
 		}
-		program, err := expr.Compile(`len(repeat())`, expr.Env(env), expr.DisableAllBuiltins(), expr.EnableBuiltin("len"))
+		program, err := anto.Compile(`len(repeat())`, anto.Env(env), anto.DisableAllBuiltins(), anto.EnableBuiltin("len"))
 		require.NoError(t, err)
 
-		out, err := expr.Run(program, env)
+		out, err := anto.Run(program, env)
 		require.NoError(t, err)
 		assert.Equal(t, 6, out)
 	})
-	t.Run("via expr.Function", func(t *testing.T) {
-		fn := expr.Function("repeat",
+	t.Run("via anto.Function", func(t *testing.T) {
+		fn := anto.Function("repeat",
 			func(params ...any) (any, error) {
 				return "repeat", nil
 			},
 			new(func() string),
 		)
-		program, err := expr.Compile(`len(repeat())`, fn, expr.DisableAllBuiltins(), expr.EnableBuiltin("len"))
+		program, err := anto.Compile(`len(repeat())`, fn, anto.DisableAllBuiltins(), anto.EnableBuiltin("len"))
 		require.NoError(t, err)
 
-		out, err := expr.Run(program, nil)
+		out, err := anto.Run(program, nil)
 		require.NoError(t, err)
 		assert.Equal(t, 6, out)
 	})
@@ -380,7 +380,7 @@ func TestBuiltin_type(t *testing.T) {
 		{func() {}, "func"},
 		{time.Now(), "time.Time"},
 		{time.Second, "time.Duration"},
-		{Foo{}, "github.com/antonmedv/expr/builtin_test.Foo"},
+		{Foo{}, "github.com/anto-lang/anto/builtin_test.Foo"},
 		{struct{}{}, "struct"},
 		{a, "int"},
 	}
@@ -389,10 +389,10 @@ func TestBuiltin_type(t *testing.T) {
 			env := map[string]any{
 				"obj": test.obj,
 			}
-			program, err := expr.Compile(`type(obj)`, expr.Env(env))
+			program, err := anto.Compile(`type(obj)`, anto.Env(env))
 			require.NoError(t, err)
 
-			out, err := expr.Run(program, env)
+			out, err := anto.Run(program, env)
 			require.NoError(t, err)
 			assert.Equal(t, test.want, out)
 		})
@@ -418,10 +418,10 @@ func TestBuiltin_sort(t *testing.T) {
 
 	for _, test := range tests {
 		t.Run(test.input, func(t *testing.T) {
-			program, err := expr.Compile(test.input, expr.Env(env))
+			program, err := anto.Compile(test.input, anto.Env(env))
 			require.NoError(t, err)
 
-			out, err := expr.Run(program, env)
+			out, err := anto.Run(program, env)
 			require.NoError(t, err)
 			assert.Equal(t, test.want, out)
 		})

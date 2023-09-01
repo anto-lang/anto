@@ -12,18 +12,18 @@ To use `-` operator:
 Now() - CreatedAt
 ```
 
-To overload the operator use [Operator](https://pkg.go.dev/github.com/antonmedv/expr?tab=doc#Operator) option:
+To overload the operator use [Operator](https://pkg.go.dev/github.com/anto-lang/anto?tab=doc#Operator) option:
 
 ```go
 func main() {
 	code := `Now() - CreatedAt`
 
-	options := []expr.Option{
-		expr.Env(Env{}),
-		expr.Operator("-", "Sub"), // Replace `-` operator with function `Sub`.
+	options := []anto.Option{
+		anto.Env(Env{}),
+		anto.Operator("-", "Sub"), // Replace `-` operator with function `Sub`.
 	}
 
-	program, err := expr.Compile(code, options...)
+	program, err := anto.Compile(code, options...)
 	if err != nil {
 		panic(err)
 	}
@@ -32,7 +32,7 @@ func main() {
 		CreatedAt: time.Date(1987, time.November, 24, 20, 0, 0, 0, time.UTC),
 	}
 
-	output, err := expr.Run(program, env)
+	output, err := anto.Run(program, env)
 	if err != nil {
 		panic(err)
 	}

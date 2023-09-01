@@ -5,8 +5,8 @@ import (
 	"os"
 	"testing"
 
-	"github.com/antonmedv/expr"
-	"github.com/antonmedv/expr/test/crowdsec"
+	"github.com/anto-lang/anto"
+	"github.com/anto-lang/anto/test/crowdsec"
 	"github.com/stretchr/testify/require"
 )
 
@@ -22,13 +22,13 @@ func TestCrowdsec(t *testing.T) {
 		"evt": &crowdsec.Event{},
 	}
 
-	var opt = []expr.Option{
-		expr.Env(env),
+	var opt = []anto.Option{
+		anto.Env(env),
 	}
 	for _, fn := range crowdsec.CustomFunctions {
 		opt = append(
 			opt,
-			expr.Function(
+			anto.Function(
 				fn.Name,
 				func(params ...any) (any, error) {
 					return nil, nil
@@ -40,7 +40,7 @@ func TestCrowdsec(t *testing.T) {
 
 	for _, line := range examples {
 		t.Run(line, func(t *testing.T) {
-			_, err = expr.Compile(line, opt...)
+			_, err = anto.Compile(line, opt...)
 			require.NoError(t, err)
 		})
 	}

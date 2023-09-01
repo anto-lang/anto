@@ -5,12 +5,12 @@ import (
 	"strings"
 	"testing"
 
-	"github.com/antonmedv/expr"
-	"github.com/antonmedv/expr/ast"
-	"github.com/antonmedv/expr/checker"
-	"github.com/antonmedv/expr/conf"
-	"github.com/antonmedv/expr/optimizer"
-	"github.com/antonmedv/expr/parser"
+	"github.com/anto-lang/anto"
+	"github.com/anto-lang/anto/ast"
+	"github.com/anto-lang/anto/checker"
+	"github.com/anto-lang/anto/conf"
+	"github.com/anto-lang/anto/optimizer"
+	"github.com/anto-lang/anto/parser"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 )
@@ -111,7 +111,7 @@ func TestOptimize_in_range(t *testing.T) {
 }
 
 func TestOptimize_in_range_with_floats(t *testing.T) {
-	out, err := expr.Eval(`f in 1..3`, map[string]any{"f": 1.5})
+	out, err := anto.Eval(`f in 1..3`, map[string]any{"f": 1.5})
 	require.NoError(t, err)
 	assert.Equal(t, false, out)
 }

@@ -8,9 +8,9 @@ import (
 	"regexp"
 	"strings"
 
-	"github.com/antonmedv/expr/builtin"
-	"github.com/antonmedv/expr/file"
-	"github.com/antonmedv/expr/vm/runtime"
+	"github.com/anto-lang/anto/builtin"
+	"github.com/anto-lang/anto/file"
+	"github.com/anto-lang/anto/vm/runtime"
 )
 
 var MemoryBudget int = 1e6

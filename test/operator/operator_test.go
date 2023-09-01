@@ -4,8 +4,8 @@ import (
 	"testing"
 	"time"
 
-	"github.com/antonmedv/expr"
-	"github.com/antonmedv/expr/test/mock"
+	"github.com/anto-lang/anto"
+	"github.com/anto-lang/anto/test/mock"
 	"github.com/stretchr/testify/require"
 )
 
@@ -16,24 +16,24 @@ func TestOperator_struct(t *testing.T) {
 
 	code := `Time == "2017-10-23"`
 
-	program, err := expr.Compile(code, expr.Env(mock.Env{}), expr.Operator("==", "TimeEqualString"))
+	program, err := anto.Compile(code, anto.Env(mock.Env{}), anto.Operator("==", "TimeEqualString"))
 	require.NoError(t, err)
 
-	output, err := expr.Run(program, env)
+	output, err := anto.Run(program, env)
 	require.NoError(t, err)
 	require.Equal(t, true, output)
 }
 
 func TestOperator_options_another_order(t *testing.T) {
 	code := `Time == "2017-10-23"`
-	_, err := expr.Compile(code, expr.Operator("==", "TimeEqualString"), expr.Env(mock.Env{}))
+	_, err := anto.Compile(code, anto.Operator("==", "TimeEqualString"), anto.Env(mock.Env{}))
 	require.NoError(t, err)
 }
 
 func TestOperator_no_env(t *testing.T) {
 	code := `Time == "2017-10-23"`
 	require.Panics(t, func() {
-		_, _ = expr.Compile(code, expr.Operator("==", "TimeEqualString"))
+		_, _ = anto.Compile(code, anto.Operator("==", "TimeEqualString"))
 	})
 }
 
@@ -42,15 +42,15 @@ func TestOperator_interface(t *testing.T) {
 
 	code := `Foo == "Foo.String" && "Foo.String" == Foo && Time != Foo && Time == Time`
 
-	program, err := expr.Compile(
+	program, err := anto.Compile(
 		code,
-		expr.Env(mock.Env{}),
-		expr.Operator("==", "StringerStringEqual", "StringStringerEqual", "StringerStringerEqual"),
-		expr.Operator("!=", "NotStringerStringEqual", "NotStringStringerEqual", "NotStringerStringerEqual"),
+		anto.Env(mock.Env{}),
+		anto.Operator("==", "StringerStringEqual", "StringStringerEqual", "StringerStringerEqual"),
+		anto.Operator("!=", "NotStringerStringEqual", "NotStringStringerEqual", "NotStringerStringerEqual"),
 	)
 	require.NoError(t, err)
 
-	output, err := expr.Run(program, env)
+	output, err := anto.Run(program, env)
 	require.NoError(t, err)
 	require.Equal(t, true, output)
 }

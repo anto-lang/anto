@@ -4,10 +4,10 @@ import (
 	"math"
 	"testing"
 
-	"github.com/antonmedv/expr"
-	"github.com/antonmedv/expr/test/playground"
-	"github.com/antonmedv/expr/vm"
-	"github.com/antonmedv/expr/vm/runtime"
+	"github.com/anto-lang/anto"
+	"github.com/anto-lang/anto/test/playground"
+	"github.com/anto-lang/anto/vm"
+	"github.com/anto-lang/anto/vm/runtime"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 )
@@ -273,7 +273,7 @@ func TestCompile(t *testing.T) {
 	}
 
 	for _, test := range tests {
-		program, err := expr.Compile(test.input, expr.Env(Env{}), expr.Optimize(false))
+		program, err := anto.Compile(test.input, anto.Env(Env{}), anto.Optimize(false))
 		require.NoError(t, err, test.input)
 
 		assert.Equal(t, test.program.Disassemble(), program.Disassemble(), test.input)
@@ -289,7 +289,7 @@ func TestCompile_panic(t *testing.T) {
 	}
 	for _, test := range tests {
 		t.Run(test, func(t *testing.T) {
-			_, err := expr.Compile(test, expr.Env(playground.Blog{}))
+			_, err := anto.Compile(test, anto.Env(playground.Blog{}))
 			require.Error(t, err)
 		})
 	}

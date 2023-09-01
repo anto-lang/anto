@@ -3,7 +3,7 @@ package interface_method_test
 import (
 	"testing"
 
-	"github.com/antonmedv/expr"
+	"github.com/anto-lang/anto"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 )
@@ -38,11 +38,11 @@ func TestInterfaceMethod(t *testing.T) {
 	env := map[string]any{
 		"var": FooImpl{},
 	}
-	p, err := expr.Compile(`var.Foo().Bar()`, expr.Env(env))
+	p, err := anto.Compile(`var.Foo().Bar()`, anto.Env(env))
 
 	assert.NoError(t, err)
 
-	out, err := expr.Run(p, env)
+	out, err := anto.Run(p, env)
 	assert.NoError(t, err)
 	assert.Equal(t, 42, out)
 }

@@ -1,4 +1,4 @@
-package expr_test
+package anto_test
 
 import (
 	"encoding/json"
@@ -7,16 +7,16 @@ import (
 	"testing"
 	"time"
 
-	"github.com/antonmedv/expr"
-	"github.com/antonmedv/expr/ast"
-	"github.com/antonmedv/expr/file"
-	"github.com/antonmedv/expr/test/mock"
+	"github.com/anto-lang/anto"
+	"github.com/anto-lang/anto/ast"
+	"github.com/anto-lang/anto/file"
+	"github.com/anto-lang/anto/test/mock"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 )
 
 func ExampleEval() {
-	output, err := expr.Eval("greet + name", map[string]any{
+	output, err := anto.Eval("greet + name", map[string]any{
 		"greet": "Hello, ",
 		"name":  "world!",
 	})
@@ -31,7 +31,7 @@ func ExampleEval() {
 }
 
 func ExampleEval_runtime_error() {
-	_, err := expr.Eval(`map(1..3, {1 % (# - 3)})`, nil)
+	_, err := anto.Eval(`map(1..3, {1 % (# - 3)})`, nil)
 	fmt.Print(err)
 
 	// Output: runtime error: integer divide by zero (1:14)
@@ -45,13 +45,13 @@ func ExampleCompile() {
 		"bar": 99,
 	}
 
-	program, err := expr.Compile("foo in 1..99 and bar in 1..99", expr.Env(env))
+	program, err := anto.Compile("foo in 1..99 and bar in 1..99", anto.Env(env))
 	if err != nil {
 		fmt.Printf("%v", err)
 		return
 	}
 
-	output, err := expr.Run(program, env)
+	output, err := anto.Run(program, env)
 	if err != nil {
 		fmt.Printf("%v", err)
 		return
@@ -81,7 +81,7 @@ func ExampleEnv() {
 
 	code := `all(Segments, {.Origin == "MOW"}) && Passengers.Adults > 0 && Tags["foo"] startsWith "bar"`
 
-	program, err := expr.Compile(code, expr.Env(Env{}))
+	program, err := anto.Compile(code, anto.Env(Env{}))
 	if err != nil {
 		fmt.Printf("%v", err)
 		return
@@ -102,7 +102,7 @@ func ExampleEnv() {
 		Marker: "test",
 	}
 
-	output, err := expr.Run(program, env)
+	output, err := anto.Run(program, env)
 	if err != nil {
 		fmt.Printf("%v", err)
 		return
@@ -124,7 +124,7 @@ func ExampleEnv_tagged_field_names() {
 		SecondWord: "World",
 	}
 
-	output, err := expr.Eval(`FirstWord + Space + second_word`, env)
+	output, err := anto.Eval(`FirstWord + Space + second_word`, env)
 	if err != nil {
 		fmt.Printf("%v", err)
 		return
@@ -136,13 +136,13 @@ func ExampleEnv_tagged_field_names() {
 }
 
 func ExampleAsKind() {
-	program, err := expr.Compile("{a: 1, b: 2}", expr.AsKind(reflect.Map))
+	program, err := anto.Compile("{a: 1, b: 2}", anto.AsKind(reflect.Map))
 	if err != nil {
 		fmt.Printf("%v", err)
 		return
 	}
 
-	output, err := expr.Run(program, nil)
+	output, err := anto.Run(program, nil)
 	if err != nil {
 		fmt.Printf("%v", err)
 		return
@@ -158,13 +158,13 @@ func ExampleAsBool() {
 		"foo": 0,
 	}
 
-	program, err := expr.Compile("foo >= 0", expr.Env(env), expr.AsBool())
+	program, err := anto.Compile("foo >= 0", anto.Env(env), anto.AsBool())
 	if err != nil {
 		fmt.Printf("%v", err)
 		return
 	}
 
-	output, err := expr.Run(program, env)
+	output, err := anto.Run(program, env)
 	if err != nil {
 		fmt.Printf("%v", err)
 		return
@@ -180,7 +180,7 @@ func ExampleAsBool_error() {
 		"foo": 0,
 	}
 
-	_, err := expr.Compile("foo + 42", expr.Env(env), expr.AsBool())
+	_, err := anto.Compile("foo + 42", anto.Env(env), anto.AsBool())
 
 	fmt.Printf("%v", err)
 
@@ -188,13 +188,13 @@ func ExampleAsBool_error() {
 }
 
 func ExampleAsInt() {
-	program, err := expr.Compile("42", expr.AsInt())
+	program, err := anto.Compile("42", anto.AsInt())
 	if err != nil {
 		fmt.Printf("%v", err)
 		return
 	}
 
-	output, err := expr.Run(program, nil)
+	output, err := anto.Run(program, nil)
 	if err != nil {
 		fmt.Printf("%v", err)
 		return
@@ -210,13 +210,13 @@ func ExampleAsInt64() {
 		"rating": 5.5,
 	}
 
-	program, err := expr.Compile("rating", expr.Env(env), expr.AsInt64())
+	program, err := anto.Compile("rating", anto.Env(env), anto.AsInt64())
 	if err != nil {
 		fmt.Printf("%v", err)
 		return
 	}
 
-	output, err := expr.Run(program, env)
+	output, err := anto.Run(program, env)
 	if err != nil {
 		fmt.Printf("%v", err)
 		return
@@ -228,13 +228,13 @@ func ExampleAsInt64() {
 }
 
 func ExampleAsFloat64() {
-	program, err := expr.Compile("42", expr.AsFloat64())
+	program, err := anto.Compile("42", anto.AsFloat64())
 	if err != nil {
 		fmt.Printf("%v", err)
 		return
 	}
 
-	output, err := expr.Run(program, nil)
+	output, err := anto.Run(program, nil)
 	if err != nil {
 		fmt.Printf("%v", err)
 		return
@@ -246,7 +246,7 @@ func ExampleAsFloat64() {
 }
 
 func ExampleAsFloat64_error() {
-	_, err := expr.Compile(`!!true`, expr.AsFloat64())
+	_, err := anto.Compile(`!!true`, anto.AsFloat64())
 
 	fmt.Printf("%v", err)
 
@@ -266,13 +266,13 @@ func ExampleOperator() {
 		After     func(a, b time.Time) bool
 	}
 
-	options := []expr.Option{
-		expr.Env(Env{}),
-		expr.Operator(">", "After"),
-		expr.Operator("-", "Sub"),
+	options := []anto.Option{
+		anto.Env(Env{}),
+		anto.Operator(">", "After"),
+		anto.Operator("-", "Sub"),
 	}
 
-	program, err := expr.Compile(code, options...)
+	program, err := anto.Compile(code, options...)
 	if err != nil {
 		fmt.Printf("%v", err)
 		return
@@ -285,7 +285,7 @@ func ExampleOperator() {
 		After:     func(a, b time.Time) bool { return a.After(b) },
 	}
 
-	output, err := expr.Run(program, env)
+	output, err := anto.Run(program, env)
 	if err != nil {
 		fmt.Printf("%v", err)
 		return
@@ -311,12 +311,12 @@ func ExampleConstExpr() {
 		"dyn": 0,
 	}
 
-	options := []expr.Option{
-		expr.Env(env),
-		expr.ConstExpr("fib"), // Mark fib func as constant expression.
+	options := []anto.Option{
+		anto.Env(env),
+		anto.ConstExpr("fib"), // Mark fib func as constant expression.
 	}
 
-	program, err := expr.Compile(code, options...)
+	program, err := anto.Compile(code, options...)
 	if err != nil {
 		fmt.Printf("%v", err)
 		return
@@ -325,7 +325,7 @@ func ExampleConstExpr() {
 	// Only fib(5) and fib(6) calculated on Compile, fib(dyn) can be called at runtime.
 	env["dyn"] = 7
 
-	output, err := expr.Run(program, env)
+	output, err := anto.Run(program, env)
 	if err != nil {
 		fmt.Printf("%v", err)
 		return
@@ -343,18 +343,18 @@ func ExampleAllowUndefinedVariables() {
 		"sprintf": fmt.Sprintf,
 	}
 
-	options := []expr.Option{
-		expr.Env(env),
-		expr.AllowUndefinedVariables(), // Allow to use undefined variables.
+	options := []anto.Option{
+		anto.Env(env),
+		anto.AllowUndefinedVariables(), // Allow to use undefined variables.
 	}
 
-	program, err := expr.Compile(code, options...)
+	program, err := anto.Compile(code, options...)
 	if err != nil {
 		fmt.Printf("%v", err)
 		return
 	}
 
-	output, err := expr.Run(program, env)
+	output, err := anto.Run(program, env)
 	if err != nil {
 		fmt.Printf("%v", err)
 		return
@@ -363,7 +363,7 @@ func ExampleAllowUndefinedVariables() {
 
 	env["name"] = "you" // Define variables later on.
 
-	output, err = expr.Run(program, env)
+	output, err = anto.Run(program, env)
 	if err != nil {
 		fmt.Printf("%v", err)
 		return
@@ -381,12 +381,12 @@ func ExampleAllowUndefinedVariables_zero_value() {
 	// will have it as default value.
 	env := map[string]string{}
 
-	options := []expr.Option{
-		expr.Env(env),
-		expr.AllowUndefinedVariables(), // Allow to use undefined variables.
+	options := []anto.Option{
+		anto.Env(env),
+		anto.AllowUndefinedVariables(), // Allow to use undefined variables.
 	}
 
-	program, err := expr.Compile(code, options...)
+	program, err := anto.Compile(code, options...)
 	if err != nil {
 		fmt.Printf("%v", err)
 		return
@@ -397,7 +397,7 @@ func ExampleAllowUndefinedVariables_zero_value() {
 		"bar": "world!",
 	}
 
-	output, err := expr.Run(program, env)
+	output, err := anto.Run(program, env)
 	if err != nil {
 		fmt.Printf("%v", err)
 		return
@@ -413,18 +413,18 @@ func ExampleAllowUndefinedVariables_zero_value_functions() {
 	// Env is map[string]string type on which methods are defined.
 	env := mock.MapStringStringEnv{}
 
-	options := []expr.Option{
-		expr.Env(env),
-		expr.AllowUndefinedVariables(), // Allow to use undefined variables.
+	options := []anto.Option{
+		anto.Env(env),
+		anto.AllowUndefinedVariables(), // Allow to use undefined variables.
 	}
 
-	program, err := expr.Compile(code, options...)
+	program, err := anto.Compile(code, options...)
 	if err != nil {
 		fmt.Printf("%v", err)
 		return
 	}
 
-	output, err := expr.Run(program, env)
+	output, err := anto.Run(program, env)
 	if err != nil {
 		fmt.Printf("%v", err)
 		return
@@ -461,9 +461,9 @@ func ExamplePatch() {
 		}
 	*/
 
-	program, err := expr.Compile(
+	program, err := anto.Compile(
 		`greet.you.world + "!"`,
-		expr.Patch(&patcher{}),
+		anto.Patch(&patcher{}),
 	)
 	if err != nil {
 		fmt.Printf("%v", err)
@@ -477,7 +477,7 @@ func ExamplePatch() {
 		},
 	}
 
-	output, err := expr.Run(program, env)
+	output, err := anto.Run(program, env)
 	if err != nil {
 		fmt.Printf("%v", err)
 		return
@@ -496,10 +496,10 @@ func TestExpr_readme_example(t *testing.T) {
 
 	code := `sprintf(greet, names[0])`
 
-	program, err := expr.Compile(code, expr.Env(env))
+	program, err := anto.Compile(code, anto.Env(env))
 	require.NoError(t, err)
 
-	output, err := expr.Run(program, env)
+	output, err := anto.Run(program, env)
 	require.NoError(t, err)
 
 	require.Equal(t, "Hello, world!", output)
@@ -1089,23 +1089,23 @@ func TestExpr(t *testing.T) {
 	for _, tt := range tests {
 		t.Run(tt.code, func(t *testing.T) {
 			{
-				program, err := expr.Compile(tt.code, expr.Env(mock.Env{}))
+				program, err := anto.Compile(tt.code, anto.Env(mock.Env{}))
 				require.NoError(t, err, "compile error")
 
-				got, err := expr.Run(program, env)
+				got, err := anto.Run(program, env)
 				require.NoError(t, err, "run error")
 				assert.Equal(t, tt.want, got)
 			}
 			{
-				program, err := expr.Compile(tt.code, expr.Optimize(false))
+				program, err := anto.Compile(tt.code, anto.Optimize(false))
 				require.NoError(t, err, "unoptimized")
 
-				got, err := expr.Run(program, env)
+				got, err := anto.Run(program, env)
 				require.NoError(t, err, "unoptimized")
 				assert.Equal(t, tt.want, got, "unoptimized")
 			}
 			{
-				got, err := expr.Eval(tt.code, env)
+				got, err := anto.Eval(tt.code, env)
 				require.NoError(t, err, "eval")
 				assert.Equal(t, tt.want, got, "eval")
 			}
@@ -1130,10 +1130,10 @@ func TestExpr_error(t *testing.T) {
 
 	for _, tt := range tests {
 		t.Run(tt.code, func(t *testing.T) {
-			program, err := expr.Compile(tt.code, expr.Env(mock.Env{}))
+			program, err := anto.Compile(tt.code, anto.Env(mock.Env{}))
 			require.NoError(t, err)
 
-			_, err = expr.Run(program, env)
+			_, err = anto.Run(program, env)
 			require.Error(t, err)
 			assert.Equal(t, tt.want, err.Error())
 		})
@@ -1142,10 +1142,10 @@ func TestExpr_error(t *testing.T) {
 
 func TestExpr_optional_chaining(t *testing.T) {
 	env := map[string]any{}
-	program, err := expr.Compile("foo?.bar.baz", expr.Env(env), expr.AllowUndefinedVariables())
+	program, err := anto.Compile("foo?.bar.baz", anto.Env(env), anto.AllowUndefinedVariables())
 	require.NoError(t, err)
 
-	got, err := expr.Run(program, env)
+	got, err := anto.Run(program, env)
 	require.NoError(t, err)
 	assert.Equal(t, nil, got)
 }
@@ -1154,10 +1154,10 @@ func TestExpr_optional_chaining_property(t *testing.T) {
 	env := map[string]any{
 		"foo": map[string]any{},
 	}
-	program, err := expr.Compile("foo.bar?.baz", expr.Env(env))
+	program, err := anto.Compile("foo.bar?.baz", anto.Env(env))
 	require.NoError(t, err)
 
-	got, err := expr.Run(program, env)
+	got, err := anto.Run(program, env)
 	require.NoError(t, err)
 	assert.Equal(t, nil, got)
 }
@@ -1173,22 +1173,22 @@ func TestExpr_optional_chaining_nested_chains(t *testing.T) {
 			},
 		},
 	}
-	program, err := expr.Compile("foo?.bar[foo?.id]?.baz", expr.Env(env))
+	program, err := anto.Compile("foo?.bar[foo?.id]?.baz", anto.Env(env))
 	require.NoError(t, err)
 
-	got, err := expr.Run(program, env)
+	got, err := anto.Run(program, env)
 	require.NoError(t, err)
 	assert.Equal(t, "baz", got)
 }
 
 func TestExpr_eval_with_env(t *testing.T) {
-	_, err := expr.Eval("true", expr.Env(map[string]any{}))
+	_, err := anto.Eval("true", anto.Env(map[string]any{}))
 	assert.Error(t, err)
 	assert.Contains(t, err.Error(), "misused")
 }
 
 func TestExpr_fetch_from_func(t *testing.T) {
-	_, err := expr.Eval("foo.Value", map[string]any{
+	_, err := anto.Eval("foo.Value", map[string]any{
 		"foo": func() {},
 	})
 	assert.Error(t, err)
@@ -1203,10 +1203,10 @@ func TestExpr_map_default_values(t *testing.T) {
 
 	input := `foo['missing'] == '' && bar['missing'] == nil`
 
-	program, err := expr.Compile(input, expr.Env(env))
+	program, err := anto.Compile(input, anto.Env(env))
 	require.NoError(t, err)
 
-	output, err := expr.Run(program, env)
+	output, err := anto.Run(program, env)
 	require.NoError(t, err)
 	require.Equal(t, true, output)
 }
@@ -1226,7 +1226,7 @@ func TestExpr_map_default_values_compile_check(t *testing.T) {
 		},
 	}
 	for _, tt := range tests {
-		_, err := expr.Compile(tt.input, expr.Env(tt.env), expr.AllowUndefinedVariables())
+		_, err := anto.Compile(tt.input, anto.Env(tt.env), anto.AllowUndefinedVariables())
 		require.NoError(t, err)
 	}
 }
@@ -1241,15 +1241,15 @@ func TestExpr_calls_with_nil(t *testing.T) {
 		"is": mock.Is{},
 	}
 
-	p, err := expr.Compile(
+	p, err := anto.Compile(
 		"a == nil && equals(b, nil) && is.Nil(c)",
-		expr.Env(env),
-		expr.Operator("==", "equals"),
-		expr.AllowUndefinedVariables(),
+		anto.Env(env),
+		anto.Operator("==", "equals"),
+		anto.AllowUndefinedVariables(),
 	)
 	require.NoError(t, err)
 
-	out, err := expr.Run(p, env)
+	out, err := anto.Run(p, env)
 	require.NoError(t, err)
 	require.Equal(t, true, out)
 }
@@ -1274,10 +1274,10 @@ func TestExpr_call_float_arg_func_with_int(t *testing.T) {
 	}
 	for _, tt := range tests {
 		t.Run(tt.input, func(t *testing.T) {
-			p, err := expr.Compile(fmt.Sprintf("cnv(%s)", tt.input), expr.Env(env))
+			p, err := anto.Compile(fmt.Sprintf("cnv(%s)", tt.input), anto.Env(env))
 			require.NoError(t, err)
 
-			out, err := expr.Run(p, env)
+			out, err := anto.Run(p, env)
 			require.NoError(t, err)
 			require.Equal(t, tt.expected, out)
 		})
@@ -1289,10 +1289,10 @@ func TestConstExpr_error_panic(t *testing.T) {
 		"divide": func(a, b int) int { return a / b },
 	}
 
-	_, err := expr.Compile(
+	_, err := anto.Compile(
 		`1 + divide(1, 0)`,
-		expr.Env(env),
-		expr.ConstExpr("divide"),
+		anto.Env(env),
+		anto.ConstExpr("divide"),
 	)
 	require.Error(t, err)
 	require.Equal(t, "compile error: integer divide by zero (1:5)\n | 1 + divide(1, 0)\n | ....^", err.Error())
@@ -1314,10 +1314,10 @@ func TestConstExpr_error_as_error(t *testing.T) {
 		},
 	}
 
-	_, err := expr.Compile(
+	_, err := anto.Compile(
 		`1 + divide(1, 0)`,
-		expr.Env(env),
-		expr.ConstExpr("divide"),
+		anto.Env(env),
+		anto.ConstExpr("divide"),
 	)
 	require.Error(t, err)
 	require.Equal(t, "integer divide by zero", err.Error())
@@ -1329,19 +1329,19 @@ func TestConstExpr_error_wrong_type(t *testing.T) {
 		"divide": 0,
 	}
 	assert.Panics(t, func() {
-		_, _ = expr.Compile(
+		_, _ = anto.Compile(
 			`1 + divide(1, 0)`,
-			expr.Env(env),
-			expr.ConstExpr("divide"),
+			anto.Env(env),
+			anto.ConstExpr("divide"),
 		)
 	})
 }
 
 func TestConstExpr_error_no_env(t *testing.T) {
 	assert.Panics(t, func() {
-		_, _ = expr.Compile(
+		_, _ = anto.Compile(
 			`1 + divide(1, 0)`,
-			expr.ConstExpr("divide"),
+			anto.ConstExpr("divide"),
 		)
 	})
 }
@@ -1366,20 +1366,20 @@ func (p *stringerPatcher) Visit(node *ast.Node) {
 }
 
 func TestPatch(t *testing.T) {
-	program, err := expr.Compile(
+	program, err := anto.Compile(
 		`Foo == "Foo.String"`,
-		expr.Env(mock.Env{}),
-		expr.Patch(&mock.StringerPatcher{}),
+		anto.Env(mock.Env{}),
+		anto.Patch(&mock.StringerPatcher{}),
 	)
 	require.NoError(t, err)
 
-	output, err := expr.Run(program, mock.Env{})
+	output, err := anto.Run(program, mock.Env{})
 	require.NoError(t, err)
 	require.Equal(t, true, output)
 }
 
 func TestCompile_exposed_error(t *testing.T) {
-	_, err := expr.Compile(`1 == true`)
+	_, err := anto.Compile(`1 == true`)
 	require.Error(t, err)
 
 	fileError, ok := err.(*file.Error)
@@ -1394,7 +1394,7 @@ func TestCompile_exposed_error(t *testing.T) {
 }
 
 func TestAsBool_exposed_error(t *testing.T) {
-	_, err := expr.Compile(`42`, expr.AsBool())
+	_, err := anto.Compile(`42`, anto.AsBool())
 	require.Error(t, err)
 
 	_, ok := err.(*file.Error)
@@ -1403,7 +1403,7 @@ func TestAsBool_exposed_error(t *testing.T) {
 }
 
 func TestEval_exposed_error(t *testing.T) {
-	_, err := expr.Eval(`1 % 0`, nil)
+	_, err := anto.Eval(`1 % 0`, nil)
 	require.Error(t, err)
 
 	fileError, ok := err.(*file.Error)
@@ -1435,10 +1435,10 @@ func TestIssue105(t *testing.T) {
 		C.B.Field == 0
 	`
 
-	_, err := expr.Compile(code, expr.Env(Env{}))
+	_, err := anto.Compile(code, anto.Env(Env{}))
 	require.NoError(t, err)
 
-	_, err = expr.Compile(`Field == ''`, expr.Env(Env{}))
+	_, err = anto.Compile(`Field == ''`, anto.Env(Env{}))
 	require.Error(t, err)
 	require.Contains(t, err.Error(), "ambiguous identifier Field")
 }
@@ -1446,10 +1446,10 @@ func TestIssue105(t *testing.T) {
 func TestIssue_nested_closures(t *testing.T) {
 	code := `all(1..3, { all(1..3, { # > 0 }) and # > 0 })`
 
-	program, err := expr.Compile(code)
+	program, err := anto.Compile(code)
 	require.NoError(t, err)
 
-	output, err := expr.Run(program, nil)
+	output, err := anto.Run(program, nil)
 	require.NoError(t, err)
 	require.True(t, output.(bool))
 }
@@ -1457,10 +1457,10 @@ func TestIssue_nested_closures(t *testing.T) {
 func TestIssue138(t *testing.T) {
 	env := map[string]any{}
 
-	_, err := expr.Compile(`1 / (1 - 1)`, expr.Env(env))
+	_, err := anto.Compile(`1 / (1 - 1)`, anto.Env(env))
 	require.NoError(t, err)
 
-	_, err = expr.Compile(`1 % 0`, expr.Env(env))
+	_, err = anto.Compile(`1 % 0`, anto.Env(env))
 	require.Error(t, err)
 	require.Equal(t, "integer divide by zero (1:3)\n | 1 % 0\n | ..^", err.Error())
 }
@@ -1516,10 +1516,10 @@ func TestIssue154(t *testing.T) {
 	}
 
 	for _, input := range tests {
-		program, err := expr.Compile(input, expr.Env(env))
+		program, err := anto.Compile(input, anto.Env(env))
 		require.NoError(t, err, input)
 
-		output, err := expr.Run(program, env)
+		output, err := anto.Run(program, env)
 		require.NoError(t, err)
 		assert.True(t, output.(bool), input)
 	}
@@ -1576,10 +1576,10 @@ func TestIssue270(t *testing.T) {
 		{"float32a / float32b"},
 		{"float64a / float64b"},
 	} {
-		p, err := expr.Compile(each.input, expr.Env(env))
+		p, err := anto.Compile(each.input, anto.Env(env))
 		require.NoError(t, err)
 
-		out, err := expr.Run(p, env)
+		out, err := anto.Run(p, env)
 		require.NoError(t, err)
 		require.IsType(t, float64(0), out)
 	}
@@ -1599,10 +1599,10 @@ func TestIssue271(t *testing.T) {
 
 	code := `Foo.Bar[0]`
 
-	program, err := expr.Compile(code, expr.Env(Env{}))
+	program, err := anto.Compile(code, anto.Env(Env{}))
 	require.NoError(t, err)
 
-	output, err := expr.Run(program, Env{
+	output, err := anto.Run(program, Env{
 		Foo: Foo{
 			Bar: BarArray{1.0, 2.0, 3.0},
 		},
@@ -1629,10 +1629,10 @@ func TestIssue346(t *testing.T) {
 			{Bar: "bar"},
 		},
 	}
-	program, err := expr.Compile(code, expr.Env(env))
+	program, err := anto.Compile(code, anto.Env(env))
 	require.NoError(t, err)
 
-	output, err := expr.Run(program, env)
+	output, err := anto.Run(program, env)
 	require.NoError(t, err)
 	require.Equal(t, "bar", output)
 }
@@ -1645,24 +1645,24 @@ func TestCompile_allow_to_use_interface_to_get_an_element_from_map(t *testing.T)
 		},
 	}
 
-	program, err := expr.Compile(code, expr.Env(env))
+	program, err := anto.Compile(code, anto.Env(env))
 	assert.NoError(t, err)
 
-	out, err := expr.Run(program, env)
+	out, err := anto.Run(program, env)
 	assert.NoError(t, err)
 	assert.Equal(t, "ok", out)
 
 	t.Run("with allow undefined variables", func(t *testing.T) {
 		code := `{'key': 'value'}[Key]`
 		env := mock.MapStringStringEnv{}
-		options := []expr.Option{
-			expr.AllowUndefinedVariables(),
+		options := []anto.Option{
+			anto.AllowUndefinedVariables(),
 		}
 
-		program, err := expr.Compile(code, options...)
+		program, err := anto.Compile(code, options...)
 		assert.NoError(t, err)
 
-		out, err := expr.Run(program, env)
+		out, err := anto.Run(program, env)
 		assert.NoError(t, err)
 		assert.Equal(t, nil, out)
 	})
@@ -1676,10 +1676,10 @@ func TestFastCall(t *testing.T) {
 	}
 	code := `func("8")`
 
-	program, err := expr.Compile(code, expr.Env(env))
+	program, err := anto.Compile(code, anto.Env(env))
 	assert.NoError(t, err)
 
-	out, err := expr.Run(program, env)
+	out, err := anto.Run(program, env)
 	assert.NoError(t, err)
 	assert.Equal(t, float64(8), out)
 }
@@ -1692,10 +1692,10 @@ func TestFastCall_OpCallFastErr(t *testing.T) {
 	}
 	code := `func("8")`
 
-	program, err := expr.Compile(code, expr.Env(env))
+	program, err := anto.Compile(code, anto.Env(env))
 	assert.NoError(t, err)
 
-	out, err := expr.Run(program, env)
+	out, err := anto.Run(program, env)
 	assert.NoError(t, err)
 	assert.Equal(t, 8, out)
 }
@@ -1705,16 +1705,16 @@ func TestRun_custom_func_returns_an_error_as_second_arg(t *testing.T) {
 		"semver": func(value string, cmp string) (bool, error) { return true, nil },
 	}
 
-	p, err := expr.Compile(`semver("1.2.3", "= 1.2.3")`, expr.Env(env))
+	p, err := anto.Compile(`semver("1.2.3", "= 1.2.3")`, anto.Env(env))
 	assert.NoError(t, err)
 
-	out, err := expr.Run(p, env)
+	out, err := anto.Run(p, env)
 	assert.NoError(t, err)
 	assert.Equal(t, true, out)
 }
 
 func TestFunction(t *testing.T) {
-	add := expr.Function(
+	add := anto.Function(
 		"add",
 		func(p ...any) (any, error) {
 			out := 0
@@ -1726,10 +1726,10 @@ func TestFunction(t *testing.T) {
 		new(func(...int) int),
 	)
 
-	p, err := expr.Compile(`add() + add(1) + add(1, 2) + add(1, 2, 3) + add(1, 2, 3, 4)`, add)
+	p, err := anto.Compile(`add() + add(1) + add(1, 2) + add(1, 2, 3) + add(1, 2, 3, 4)`, add)
 	assert.NoError(t, err)
 
-	out, err := expr.Run(p, nil)
+	out, err := anto.Run(p, nil)
 	assert.NoError(t, err)
 	assert.Equal(t, 20, out)
 }
@@ -1743,28 +1743,28 @@ func TestRun_NilCoalescingOperator(t *testing.T) {
 	}
 
 	t.Run("value", func(t *testing.T) {
-		p, err := expr.Compile(`foo.bar ?? "default"`, expr.Env(env))
+		p, err := anto.Compile(`foo.bar ?? "default"`, anto.Env(env))
 		assert.NoError(t, err)
 
-		out, err := expr.Run(p, env)
+		out, err := anto.Run(p, env)
 		assert.NoError(t, err)
 		assert.Equal(t, "value", out)
 	})
 
 	t.Run("default", func(t *testing.T) {
-		p, err := expr.Compile(`foo.baz ?? "default"`, expr.Env(env))
+		p, err := anto.Compile(`foo.baz ?? "default"`, anto.Env(env))
 		assert.NoError(t, err)
 
-		out, err := expr.Run(p, env)
+		out, err := anto.Run(p, env)
 		assert.NoError(t, err)
 		assert.Equal(t, "default", out)
 	})
 
 	t.Run("default with chain", func(t *testing.T) {
-		p, err := expr.Compile(`foo?.bar ?? "default"`, expr.Env(env))
+		p, err := anto.Compile(`foo?.bar ?? "default"`, anto.Env(env))
 		assert.NoError(t, err)
 
-		out, err := expr.Run(p, map[string]any{})
+		out, err := anto.Run(p, map[string]any{})
 		assert.NoError(t, err)
 		assert.Equal(t, "default", out)
 	})
@@ -1776,34 +1776,34 @@ func TestEval_nil_in_maps(t *testing.T) {
 		"empty": map[any]any{},
 	}
 	t.Run("nil key exists", func(t *testing.T) {
-		p, err := expr.Compile(`m[nil]`, expr.Env(env))
+		p, err := anto.Compile(`m[nil]`, anto.Env(env))
 		assert.NoError(t, err)
 
-		out, err := expr.Run(p, env)
+		out, err := anto.Run(p, env)
 		assert.NoError(t, err)
 		assert.Equal(t, "bar", out)
 	})
 	t.Run("no nil key", func(t *testing.T) {
-		p, err := expr.Compile(`empty[nil]`, expr.Env(env))
+		p, err := anto.Compile(`empty[nil]`, anto.Env(env))
 		assert.NoError(t, err)
 
-		out, err := expr.Run(p, env)
+		out, err := anto.Run(p, env)
 		assert.NoError(t, err)
 		assert.Equal(t, nil, out)
 	})
 	t.Run("nil in m", func(t *testing.T) {
-		p, err := expr.Compile(`nil in m`, expr.Env(env))
+		p, err := anto.Compile(`nil in m`, anto.Env(env))
 		assert.NoError(t, err)
 
-		out, err := expr.Run(p, env)
+		out, err := anto.Run(p, env)
 		assert.NoError(t, err)
 		assert.Equal(t, true, out)
 	})
 	t.Run("nil in empty", func(t *testing.T) {
-		p, err := expr.Compile(`nil in empty`, expr.Env(env))
+		p, err := anto.Compile(`nil in empty`, anto.Env(env))
 		assert.NoError(t, err)
 
-		out, err := expr.Run(p, env)
+		out, err := anto.Run(p, env)
 		assert.NoError(t, err)
 		assert.Equal(t, false, out)
 	})
@@ -1871,10 +1871,10 @@ func TestEnv_keyword(t *testing.T) {
 	for _, tt := range tests {
 		t.Run(tt.code, func(t *testing.T) {
 
-			program, err := expr.Compile(tt.code, expr.Env(env))
+			program, err := anto.Compile(tt.code, anto.Env(env))
 			require.NoError(t, err, "compile error")
 
-			got, err := expr.Run(program, env)
+			got, err := anto.Run(program, env)
 			require.NoError(t, err, "execution error")
 
 			assert.Equal(t, tt.want, got, tt.code)
@@ -1883,7 +1883,7 @@ func TestEnv_keyword(t *testing.T) {
 
 	for _, tt := range tests {
 		t.Run(tt.code, func(t *testing.T) {
-			got, err := expr.Eval(tt.code, env)
+			got, err := anto.Eval(tt.code, env)
 			require.NoError(t, err, "eval error: "+tt.code)
 
 			assert.Equal(t, tt.want, got, "eval: "+tt.code)
@@ -1900,7 +1900,7 @@ func TestEnv_keyword(t *testing.T) {
 
 	for _, tt := range tests {
 		t.Run(tt.code, func(t *testing.T) {
-			_, err := expr.Eval(tt.code, expr.Env(env))
+			_, err := anto.Eval(tt.code, anto.Env(env))
 			require.Error(t, err, "compile error")
 
 		})
@@ -1909,10 +1909,10 @@ func TestEnv_keyword(t *testing.T) {
 }
 
 func TestIssue401(t *testing.T) {
-	program, err := expr.Compile("(a - b + c) / d", expr.AllowUndefinedVariables())
+	program, err := anto.Compile("(a - b + c) / d", anto.AllowUndefinedVariables())
 	require.NoError(t, err, "compile error")
 
-	output, err := expr.Run(program, map[string]any{
+	output, err := anto.Run(program, map[string]any{
 		"a": 1,
 		"b": 2,
 		"c": 3,
@@ -1935,7 +1935,7 @@ func TestEval_slices_out_of_bound(t *testing.T) {
 
 	for _, tt := range tests {
 		t.Run(tt.code, func(t *testing.T) {
-			got, err := expr.Eval(tt.code, nil)
+			got, err := anto.Eval(tt.code, nil)
 			require.NoError(t, err, "eval error: "+tt.code)
 			assert.Equal(t, tt.want, got, "eval: "+tt.code)
 		})
@@ -1952,10 +1952,10 @@ func TestMemoryBudget(t *testing.T) {
 
 	for _, tt := range tests {
 		t.Run(tt.code, func(t *testing.T) {
-			program, err := expr.Compile(tt.code)
+			program, err := anto.Compile(tt.code)
 			require.NoError(t, err, "compile error")
 
-			_, err = expr.Run(program, nil)
+			_, err = anto.Run(program, nil)
 			assert.Error(t, err, "run error")
 			assert.Contains(t, err.Error(), "memory budget exceeded")
 		})

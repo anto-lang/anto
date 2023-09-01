@@ -7,7 +7,7 @@ import (
 	"strings"
 	"time"
 
-	. "github.com/antonmedv/expr/vm"
+	. "github.com/anto-lang/anto/vm"
 	"github.com/gdamore/tcell/v2"
 	"github.com/rivo/tview"
 )

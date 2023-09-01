@@ -1,10 +1,10 @@
-package expr_test
+package anto_test
 
 import (
 	"testing"
 
-	"github.com/antonmedv/expr"
-	"github.com/antonmedv/expr/vm"
+	"github.com/anto-lang/anto"
+	"github.com/anto-lang/anto/vm"
 	"github.com/stretchr/testify/require"
 )
 
@@ -15,7 +15,7 @@ func Benchmark_expr(b *testing.B) {
 	params["Adults"] = 1
 	params["Value"] = 100
 
-	program, err := expr.Compile(`(Origin == "MOW" || Country == "RU") && (Value >= 100 || Adults == 1)`, expr.Env(params))
+	program, err := anto.Compile(`(Origin == "MOW" || Country == "RU") && (Value >= 100 || Adults == 1)`, anto.Env(params))
 	require.NoError(b, err)
 
 	var out any
@@ -37,7 +37,7 @@ func Benchmark_expr_reuseVm(b *testing.B) {
 	params["Adults"] = 1
 	params["Value"] = 100
 
-	program, err := expr.Compile(`(Origin == "MOW" || Country == "RU") && (Value >= 100 || Adults == 1)`, expr.Env(params))
+	program, err := anto.Compile(`(Origin == "MOW" || Country == "RU") && (Value >= 100 || Adults == 1)`, anto.Env(params))
 	require.NoError(b, err)
 
 	var out any
@@ -58,7 +58,7 @@ func Benchmark_len(b *testing.B) {
 		"arr": make([]int, 100),
 	}
 
-	program, err := expr.Compile(`len(arr)`, expr.Env(env))
+	program, err := anto.Compile(`len(arr)`, anto.Env(env))
 	require.NoError(b, err)
 
 	var out any
@@ -83,7 +83,7 @@ func Benchmark_filter(b *testing.B) {
 		env.Ints[i-1] = i
 	}
 
-	program, err := expr.Compile(`filter(Ints, # % 7 == 0)`, expr.Env(Env{}))
+	program, err := anto.Compile(`filter(Ints, # % 7 == 0)`, anto.Env(Env{}))
 	require.NoError(b, err)
 
 	var out any
@@ -108,7 +108,7 @@ func Benchmark_filterLen(b *testing.B) {
 		env.Ints[i-1] = i
 	}
 
-	program, err := expr.Compile(`len(filter(Ints, # % 7 == 0))`, expr.Env(Env{}))
+	program, err := anto.Compile(`len(filter(Ints, # % 7 == 0))`, anto.Env(Env{}))
 	require.NoError(b, err)
 
 	var out any
@@ -133,7 +133,7 @@ func Benchmark_filterFirst(b *testing.B) {
 		env.Ints[i-1] = i
 	}
 
-	program, err := expr.Compile(`filter(Ints, # % 7 == 0)[0]`, expr.Env(Env{}))
+	program, err := anto.Compile(`filter(Ints, # % 7 == 0)[0]`, anto.Env(Env{}))
 	require.NoError(b, err)
 
 	var out any
@@ -158,7 +158,7 @@ func Benchmark_filterLast(b *testing.B) {
 		env.Ints[i-1] = i
 	}
 
-	program, err := expr.Compile(`filter(Ints, # % 7 == 0)[-1]`, expr.Env(Env{}))
+	program, err := anto.Compile(`filter(Ints, # % 7 == 0)[-1]`, anto.Env(Env{}))
 	require.NoError(b, err)
 
 	var out any
@@ -184,7 +184,7 @@ func Benchmark_filterMap(b *testing.B) {
 		env.Ints[i-1] = i
 	}
 
-	program, err := expr.Compile(`map(filter(Ints, # % 7 == 0), # * 2)`, expr.Env(Env{}))
+	program, err := anto.Compile(`map(filter(Ints, # % 7 == 0), # * 2)`, anto.Env(Env{}))
 	require.NoError(b, err)
 
 	var out any
@@ -207,7 +207,7 @@ func Benchmark_arrayIndex(b *testing.B) {
 		env["arr"].([]int)[i] = i
 	}
 
-	program, err := expr.Compile(`arr[50]`, expr.Env(env))
+	program, err := anto.Compile(`arr[50]`, anto.Env(env))
 	require.NoError(b, err)
 
 	var out any
@@ -229,7 +229,7 @@ func Benchmark_envStruct(b *testing.B) {
 		Price Price
 	}
 
-	program, err := expr.Compile(`Price.Value > 0`, expr.Env(Env{}))
+	program, err := anto.Compile(`Price.Value > 0`, anto.Env(Env{}))
 	require.NoError(b, err)
 
 	env := Env{Price: Price{Value: 1}}
@@ -253,7 +253,7 @@ func Benchmark_envMap(b *testing.B) {
 		"price": Price{Value: 1},
 	}
 
-	program, err := expr.Compile(`price.Value > 0`, expr.Env(env))
+	program, err := anto.Compile(`price.Value > 0`, anto.Env(env))
 	require.NoError(b, err)
 
 	var out any
@@ -291,7 +291,7 @@ func (CallFoo) Method() string {
 }
 
 func Benchmark_callFunc(b *testing.B) {
-	program, err := expr.Compile(`Func()`, expr.Env(CallEnv{}))
+	program, err := anto.Compile(`Func()`, anto.Env(CallEnv{}))
 	require.NoError(b, err)
 
 	env := CallEnv{}
@@ -308,7 +308,7 @@ func Benchmark_callFunc(b *testing.B) {
 }
 
 func Benchmark_callMethod(b *testing.B) {
-	program, err := expr.Compile(`Foo.Method()`, expr.Env(CallEnv{}))
+	program, err := anto.Compile(`Foo.Method()`, anto.Env(CallEnv{}))
 	require.NoError(b, err)
 
 	env := CallEnv{}
@@ -325,7 +325,7 @@ func Benchmark_callMethod(b *testing.B) {
 }
 
 func Benchmark_callField(b *testing.B) {
-	program, err := expr.Compile(`Fn()`, expr.Env(CallEnv{}))
+	program, err := anto.Compile(`Fn()`, anto.Env(CallEnv{}))
 	require.NoError(b, err)
 
 	env := CallEnv{
@@ -346,7 +346,7 @@ func Benchmark_callField(b *testing.B) {
 }
 
 func Benchmark_callFast(b *testing.B) {
-	program, err := expr.Compile(`FnFast()`, expr.Env(CallEnv{}))
+	program, err := anto.Compile(`FnFast()`, anto.Env(CallEnv{}))
 	if err != nil {
 		b.Fatal(err)
 	}
@@ -369,7 +369,7 @@ func Benchmark_callFast(b *testing.B) {
 }
 
 func Benchmark_callConstExpr(b *testing.B) {
-	program, err := expr.Compile(`Func()`, expr.Env(CallEnv{}), expr.ConstExpr("Func"))
+	program, err := anto.Compile(`Func()`, anto.Env(CallEnv{}), anto.ConstExpr("Func"))
 	require.NoError(b, err)
 
 	env := CallEnv{}
@@ -391,7 +391,7 @@ func Benchmark_largeStructAccess(b *testing.B) {
 		Field int
 	}
 
-	program, err := expr.Compile(`Field > 0 && Field > 1 && Field < 99`, expr.Env(Env{}))
+	program, err := anto.Compile(`Field > 0 && Field > 1 && Field < 99`, anto.Env(Env{}))
 	require.NoError(b, err)
 
 	env := Env{Field: 21}
@@ -415,7 +415,7 @@ func Benchmark_largeNestedStructAccess(b *testing.B) {
 		}
 	}
 
-	program, err := expr.Compile(`Inner.Field > 0 && Inner.Field > 1 && Inner.Field < 99`, expr.Env(Env{}))
+	program, err := anto.Compile(`Inner.Field > 0 && Inner.Field > 1 && Inner.Field < 99`, anto.Env(Env{}))
 	require.NoError(b, err)
 
 	env := Env{}
@@ -437,7 +437,7 @@ func Benchmark_largeNestedArrayAccess(b *testing.B) {
 		Data [1][1024 * 1024 * 10]byte
 	}
 
-	program, err := expr.Compile(`Data[0][0] > 0`, expr.Env(Env{}))
+	program, err := anto.Compile(`Data[0][0] > 0`, anto.Env(Env{}))
 	require.NoError(b, err)
 
 	env := Env{}
@@ -459,7 +459,7 @@ func Benchmark_sort(b *testing.B) {
 		"arr": []any{55, 58, 42, 61, 75, 52, 64, 62, 16, 79, 40, 14, 50, 76, 23, 2, 5, 80, 89, 51, 21, 96, 91, 13, 71, 82, 65, 63, 11, 17, 94, 81, 74, 4, 97, 1, 39, 3, 28, 8, 84, 90, 47, 85, 7, 56, 49, 93, 33, 12, 19, 60, 86, 100, 44, 45, 36, 72, 95, 77, 34, 92, 24, 73, 18, 38, 43, 26, 41, 69, 67, 57, 9, 27, 66, 87, 46, 35, 59, 70, 10, 20, 53, 15, 32, 98, 68, 31, 54, 25, 83, 88, 22, 48, 29, 37, 6, 78, 99, 30},
 	}
 
-	program, err := expr.Compile(`sort(arr)`, expr.Env(env))
+	program, err := anto.Compile(`sort(arr)`, anto.Env(env))
 	require.NoError(b, err)
 
 	var out any
@@ -485,7 +485,7 @@ func Benchmark_sortBy(b *testing.B) {
 		env["arr"].([]Foo)[i] = Foo{Value: v.(int)}
 	}
 
-	program, err := expr.Compile(`sortBy(arr, "Value")`, expr.Env(env))
+	program, err := anto.Compile(`sortBy(arr, "Value")`, anto.Env(env))
 	require.NoError(b, err)
 
 	var out any
@@ -500,7 +500,7 @@ func Benchmark_sortBy(b *testing.B) {
 }
 
 func Benchmark_groupBy(b *testing.B) {
-	program, err := expr.Compile(`groupBy(1..100, # % 7)[6]`)
+	program, err := anto.Compile(`groupBy(1..100, # % 7)[6]`)
 	require.NoError(b, err)
 
 	var out any
@@ -514,7 +514,7 @@ func Benchmark_groupBy(b *testing.B) {
 }
 
 func Benchmark_reduce(b *testing.B) {
-	program, err := expr.Compile(`reduce(1..100, # + #acc)`)
+	program, err := anto.Compile(`reduce(1..100, # + #acc)`)
 	require.NoError(b, err)
 
 	var out any
