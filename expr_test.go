@@ -1941,23 +1941,3 @@ func TestEval_slices_out_of_bound(t *testing.T) {
 		})
 	}
 }
-
-func TestMemoryBudget(t *testing.T) {
-	tests := []struct {
-		code string
-	}{
-		{`map(1..100, {map(1..100, {map(1..100, {0})})})`},
-		{`len(1..10000000)`},
-	}
-
-	for _, tt := range tests {
-		t.Run(tt.code, func(t *testing.T) {
-			program, err := anto.Compile(tt.code)
-			require.NoError(t, err, "compile error")
-
-			_, err = anto.Run(program, nil)
-			assert.Error(t, err, "run error")
-			assert.Contains(t, err.Error(), "memory budget exceeded")
-		})
-	}
-}

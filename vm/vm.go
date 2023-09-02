@@ -13,7 +13,6 @@ import (
 	"github.com/anto-lang/anto/vm/runtime"
 )
 
-var MemoryBudget int = 1e6
 var errorType = reflect.TypeOf((*error)(nil)).Elem()
 
 type Function = func(params ...any) (any, error)
@@ -28,14 +27,12 @@ func Run(program *Program, env any) (any, error) {
 }
 
 type VM struct {
-	stack        []any
-	ip           int
-	scopes       []*Scope
-	debug        bool
-	step         chan struct{}
-	curr         chan int
-	memory       int
-	memoryBudget int
+	stack  []any
+	ip     int
+	scopes []*Scope
+	debug  bool
+	step   chan struct{}
+	curr   chan int
 }
 
 type Scope struct {
@@ -80,8 +77,6 @@ func (vm *VM) Run(program *Program, env any) (_ any, err error) {
 		vm.scopes = vm.scopes[0:0]
 	}
 
-	vm.memoryBudget = MemoryBudget
-	vm.memory = 0
 	vm.ip = 0
 
 	for vm.ip < len(program.Bytecode) {
@@ -268,12 +263,7 @@ func (vm *VM) Run(program *Program, env any) (_ any, err error) {
 			a := vm.pop()
 			min := runtime.ToInt(a)
 			max := runtime.ToInt(b)
-			size := max - min + 1
-			if vm.memory+size >= vm.memoryBudget {
-				panic("memory budget exceeded")
-			}
 			vm.push(runtime.MakeRange(min, max))
-			vm.memory += size
 
 		case OpMatches:
 			b := vm.pop()
@@ -400,10 +390,6 @@ func (vm *VM) Run(program *Program, env any) (_ any, err error) {
 				array[i] = vm.pop()
 			}
 			vm.push(array)
-			vm.memory += size
-			if vm.memory >= vm.memoryBudget {
-				panic("memory budget exceeded")
-			}
 
 		case OpMap:
 			size := vm.pop().(int)
@@ -414,10 +400,6 @@ func (vm *VM) Run(program *Program, env any) (_ any, err error) {
 				m[key.(string)] = value
 			}
 			vm.push(m)
-			vm.memory += size
-			if vm.memory >= vm.memoryBudget {
-				panic("memory budget exceeded")
-			}
 
 		case OpLen:
 			vm.push(runtime.Len(vm.current()))
