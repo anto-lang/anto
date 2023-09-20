@@ -542,6 +542,11 @@ map(1..9, #unknown)
 unknown pointer #unknown (1:11)
  | map(1..9, #unknown)
  | ..........^
+
+42 in ["a", "b", "c"]
+cannot use int as type string in array (1:4)
+ | 42 in ["a", "b", "c"]
+ | ...^
 `
 
 func TestCheck_error(t *testing.T) {
